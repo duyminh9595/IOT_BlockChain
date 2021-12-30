@@ -1,0 +1,200 @@
+Organizations:
+
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: ../../setup1/orderer/crypto-config/ordererOrganizations/thesis.com/msp
+
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+
+    - &thayson
+        Name: thaysonMSP
+        ID: thaysonMSP
+
+        MSPDir: ../../setup1/thayson/crypto-config/peerOrganizations/thayson.thesis.com/msp
+
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('thaysonMSP.admin', 'thaysonMSP.peer', 'thaysonMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('thaysonMSP.admin', 'thaysonMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('thaysonMSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('thaysonMSP.peer')"
+
+        AnchorPeers:
+            - Host: peer0.thayson.thesis.com
+              Port: 7051
+
+    - &cohuong
+        Name: cohuongMSP
+
+        ID: cohuongMSP
+
+        MSPDir: ../../setup1/cohuong/crypto-config/peerOrganizations/cohuong.thesis.com/msp
+
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('cohuongMSP.admin', 'cohuongMSP.peer', 'cohuongMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('cohuongMSP.admin', 'cohuongMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('cohuongMSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('cohuongMSP.peer')"
+
+        AnchorPeers:
+            - Host: peer0.cohuong.thesis.com
+              Port: 9051
+
+    
+
+Capabilities:
+    Channel: &ChannelCapabilities
+        V2_0: true
+
+    Orderer: &OrdererCapabilities
+        V2_0: true
+
+    Application: &ApplicationCapabilities
+        V2_0: true
+
+Application: &ApplicationDefaults
+
+    Organizations:
+
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+
+    OrdererType: etcdraft
+
+    EtcdRaft:
+        Consenters:
+        - Host: orderer.thesis.com
+          Port: 7050
+          ClientTLSCert: ../../setup1/orderer/crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/tls/server.crt
+          ServerTLSCert: ../../setup1/orderer/crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/tls/server.crt
+    Addresses:
+        - orderer.thesis.com:7050
+
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ChannelCapabilities
+
+Profiles:
+
+    BasicChannel:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *thayson
+                - *cohuong
+            Capabilities:
+                <<: *ApplicationCapabilities
+
+    OrdererGenesis:
+        <<: *ChannelDefaults
+        Capabilities:
+            <<: *ChannelCapabilities
+        Orderer:
+            <<: *OrdererDefaults
+            OrdererType: etcdraft
+            EtcdRaft:
+                Consenters:
+                - Host: orderer.thesis.com
+                  Port: 7050
+                  ClientTLSCert: ../../setup1/orderer/crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/tls/server.crt
+                  ServerTLSCert: ../../setup1/orderer/crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/tls/server.crt
+                - Host: orderer2.thesis.com
+                  Port: 8050
+                  ClientTLSCert: ../../setup1/orderer/crypto-config/ordererOrganizations/thesis.com/orderers/orderer2.thesis.com/tls/server.crt
+                  ServerTLSCert: ../../setup1/orderer/crypto-config/ordererOrganizations/thesis.com/orderers/orderer2.thesis.com/tls/server.crt
+                - Host: orderer3.thesis.com
+                  Port: 9050
+                  ClientTLSCert: ../../setup1/orderer/crypto-config/ordererOrganizations/thesis.com/orderers/orderer3.thesis.com/tls/server.crt
+                  ServerTLSCert: ../../setup1/orderer/crypto-config/ordererOrganizations/thesis.com/orderers/orderer3.thesis.com/tls/server.crt
+            Addresses:
+                - orderer.thesis.com:7050
+                - orderer2.thesis.com:8050
+                - orderer3.thesis.com:9050
+
+            Organizations:
+            - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                - *thayson
+                - *cohuong

@@ -1,0 +1,60 @@
+{
+    "name": "first-network-thayson",
+    "version": "1.0.0",
+    "client": {
+        "organization": "thayson",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300"
+                }
+            }
+        }
+    },
+    "organizations": {
+        "thayson": {
+            "mspid": "thaysonMSP",
+            "peers": [
+                "peer0.thayson.thesis.com",
+                "peer1.thayson.thesis.com"
+            ],
+            "certificateAuthorities": [
+                "ca.thayson.thesis.com"
+            ]
+        }
+    },
+    "peers": {
+        "peer0.thayson.thesis.com": {
+            "url": "grpcs://peer0.thayson.thesis.com:7051",
+            "tlsCACerts": {
+                "pem": "-----BEGIN CERTIFICATE-----\nMIICFzCCAb2gAwIBAgIUbgVwAC64xOVXRSvtnHx3et5QpjQwCgYIKoZIzj0EAwIw\naDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK\nEwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt\nY2Etc2VydmVyMB4XDTIxMTIyMjExMjUwMFoXDTM2MTIxODExMjUwMFowaDELMAkG\nA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl\ncmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy\ndmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEsPHvNcY8VgUaMa/HvoVhPoPm\naZ+VSoKKJuhZGH2bYOoPsqQc2Zwp3Oz1QDr/kFAk+RCxdplgDcKNdariLRyLvaNF\nMEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE\nFC83SpA7iHep7pzKKd6yOLUYJlrjMAoGCCqGSM49BAMCA0gAMEUCIQCUwV7L90j9\nx61Z/rVXXXOWRwQW0Qwps99GspSXw2lDswIgF/oAyPHLFovvcGD1IKw2/OWpjvSz\nlgK9zW+BU6btPWo=\n-----END CERTIFICATE-----\n"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.thayson.thesis.com",
+                "hostnameOverride": "peer0.thayson.thesis.com"
+            }
+        },
+        "peer1.thayson.thesis.com": {
+            "url": "grpcs://peer1.thayson.thesis.com:8051",
+            "tlsCACerts": {
+                "pem": "-----BEGIN CERTIFICATE-----\nMIICFzCCAb2gAwIBAgIUbgVwAC64xOVXRSvtnHx3et5QpjQwCgYIKoZIzj0EAwIw\naDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK\nEwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt\nY2Etc2VydmVyMB4XDTIxMTIyMjExMjUwMFoXDTM2MTIxODExMjUwMFowaDELMAkG\nA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl\ncmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy\ndmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEsPHvNcY8VgUaMa/HvoVhPoPm\naZ+VSoKKJuhZGH2bYOoPsqQc2Zwp3Oz1QDr/kFAk+RCxdplgDcKNdariLRyLvaNF\nMEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE\nFC83SpA7iHep7pzKKd6yOLUYJlrjMAoGCCqGSM49BAMCA0gAMEUCIQCUwV7L90j9\nx61Z/rVXXXOWRwQW0Qwps99GspSXw2lDswIgF/oAyPHLFovvcGD1IKw2/OWpjvSz\nlgK9zW+BU6btPWo=\n-----END CERTIFICATE-----\n"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer1.thayson.thesis.com",
+                "hostnameOverride": "peer1.thayson.thesis.com"
+            }
+        }
+    },
+    "certificateAuthorities": {
+        "ca.thayson.thesis.com": {
+            "url": "https://ca.thayson.thesis.com:7054",
+            "caName": "ca.thayson.thesis.com",
+            "tlsCACerts": {
+                "pem": "-----BEGIN CERTIFICATE-----\nMIICFzCCAb2gAwIBAgIUbgVwAC64xOVXRSvtnHx3et5QpjQwCgYIKoZIzj0EAwIw\naDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK\nEwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt\nY2Etc2VydmVyMB4XDTIxMTIyMjExMjUwMFoXDTM2MTIxODExMjUwMFowaDELMAkG\nA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl\ncmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy\ndmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEsPHvNcY8VgUaMa/HvoVhPoPm\naZ+VSoKKJuhZGH2bYOoPsqQc2Zwp3Oz1QDr/kFAk+RCxdplgDcKNdariLRyLvaNF\nMEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE\nFC83SpA7iHep7pzKKd6yOLUYJlrjMAoGCCqGSM49BAMCA0gAMEUCIQCUwV7L90j9\nx61Z/rVXXXOWRwQW0Qwps99GspSXw2lDswIgF/oAyPHLFovvcGD1IKw2/OWpjvSz\nlgK9zW+BU6btPWo=\n-----END CERTIFICATE-----\n"
+            },
+            "httpOptions": {
+                "verify": false
+            }
+        }
+    }
+}

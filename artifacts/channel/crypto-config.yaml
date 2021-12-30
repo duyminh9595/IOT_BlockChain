@@ -1,0 +1,44 @@
+
+OrdererOrgs:
+  - Name: Orderer
+    Domain: thesis.com
+    EnableNodeOUs: true
+
+    Specs:
+      - Hostname: orderer
+        SANS:
+            - "localhost"
+            - "127.0.0.1"
+      - Hostname: orderer2
+        SANS:
+          - "localhost"
+          - "127.0.0.1"
+      - Hostname: orderer3
+        SANS:
+            - "localhost"
+            - "127.0.0.1"
+
+PeerOrgs:
+  - Name: thayson
+    Domain: thayson.thesis.com
+    EnableNodeOUs: true
+
+    Template:
+      Count: 2
+      SANS:
+        - "localhost"
+
+    Users:
+      Count: 1
+
+  - Name: cohuong
+    Domain: cohuong.thesis.com
+    EnableNodeOUs: true
+
+    Template:
+      Count: 2
+      SANS:
+        - "localhost"
+
+    Users:
+      Count: 1
