@@ -40,31 +40,7 @@ Organizations:
             - Host: peer0.thayson.thesis.com
               Port: 7051
 
-    - &cohuong
-        Name: cohuongMSP
-
-        ID: cohuongMSP
-
-        MSPDir: ../../setup1/cohuong/crypto-config/peerOrganizations/cohuong.thesis.com/msp
-
-        Policies:
-            Readers:
-                Type: Signature
-                Rule: "OR('cohuongMSP.admin', 'cohuongMSP.peer', 'cohuongMSP.client')"
-            Writers:
-                Type: Signature
-                Rule: "OR('cohuongMSP.admin', 'cohuongMSP.client')"
-            Admins:
-                Type: Signature
-                Rule: "OR('cohuongMSP.admin')"
-            Endorsement:
-                Type: Signature
-                Rule: "OR('cohuongMSP.peer')"
-
-        AnchorPeers:
-            - Host: peer0.cohuong.thesis.com
-              Port: 9051
-
+    
     
 
 Capabilities:
@@ -159,7 +135,6 @@ Profiles:
             <<: *ApplicationDefaults
             Organizations:
                 - *thayson
-                - *cohuong
             Capabilities:
                 <<: *ApplicationCapabilities
 
@@ -197,4 +172,3 @@ Profiles:
             SampleConsortium:
                 Organizations:
                 - *thayson
-                - *cohuong

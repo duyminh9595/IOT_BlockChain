@@ -18,32 +18,21 @@ const port = process.env.PORT || constants.port;
 
 const bcrypt = require('bcrypt')
 const {
-    v1: uuidv1,
     v4: uuidv4,
 } = require('uuid');
 
 const helper = require('./app/helper')
-const invoke = require('./app/invoke')
 const register = require('./app/register')
-const qscc = require('./app/qscc')
-const query = require('./app/query')
+
 
 
 const login = require('./app/login')
 const changepassword = require('./app/changepassword')
-const changeinfo = require('./app/changeinfo')
-const adduserincome = require('./app/adduserincome')
-const seealluserincome = require('./app/seealluserincome')
-const seeuserincomeid = require('./app/seeuserincomeid')
-const adduserspending = require('./app/adduserspending')
-const seealluserspending = require('./app/seealluserspending')
-const seeuserspendingid = require('./app/seeuserspendingid')
-const addusertarget = require('./app/addusertarget')
-const seeallusertarget = require('./app/seeallusertarget')
-const addusertransactiontotarget = require('./app/addusertransactiontotarget')
-const seehistorytransactionhasaddedtarget = require('./app/seehistorytransactionhasaddedtarget')
-const seeall = require('./app/seeall')
-const seeinfortarget = require('./app/seeinfortarget')
+const addFarm = require('./app/addFarm')
+const seefarmbaseonid = require('./app/seeinfobaseonfarmid')
+const seeallfarm = require('./app/seeinfoallfarm')
+
+
 
 
 
@@ -58,7 +47,7 @@ app.set('secret', 'thisismysecret');
 app.use(expressJWT({
     secret: 'thisismysecret'
 }).unless({
-    path: ['/users', '/login', '/register/']
+    path: ['/login', '/register/', '/api/farm']
 }));
 app.use(bearerToken());
 
@@ -67,7 +56,8 @@ logger.level = 'debug';
 
 app.use((req, res, next) => {
     logger.debug('New req for %s', req.originalUrl);
-    if (req.originalUrl.indexOf('/users') >= 0 || req.originalUrl.indexOf('/login') >= 0 || req.originalUrl.indexOf('/register') >= 0) {
+    if (req.originalUrl.indexOf('/login') >= 0 || req.originalUrl.indexOf('/register') >= 0 ||
+        req.originalUrl.indexOf('/') >= 0 || req.originalUrl.indexOf('/api/farm') >= 0) {
         return next();
     }
     var token = req.token;
@@ -103,62 +93,16 @@ function getErrorMessage(field) {
     return response;
 }
 
-// Register and enroll user
-app.post('/users', async function (req, res) {
-    var username = req.body.username;
-    var orgName = req.body.orgName;
-    var password = req.body.password;
-    logger.debug('End point : /users');
-    logger.debug('User name : ' + username);
-    logger.debug('Org name  : ' + orgName);
-    logger.debug('Password  : ' + password);
-    if (!username) {
-        res.json(getErrorMessage('\'username\''));
-        return;
-    }
-    if (!orgName) {
-        res.json(getErrorMessage('\'orgName\''));
-        return;
-    }
-
-    var token = jwt.sign({
-        exp: Math.floor(Date.now() / 1000) + parseInt(constants.jwt_expiretime),
-        username: username,
-        orgName: orgName
-    }, app.get('secret'));
-
-    let response = await helper.getRegisteredUser(username, orgName, true);
-    var salt = bcrypt.genSaltSync(10)
-    var hash = bcrypt.hashSync(req.body.password, salt)
-    logger.debug('Password has : ' + hash);
-    logger.debug('-- returned from registering the username %s for organization %s', username, "thayson");
-    if (response && typeof response !== 'string') {
-        logger.debug('Successfully registered the username %s for organization %s', username, "thayson");
-        let message = await register.invokeTransaction("mychannel", "thesis", "registerUser", username, hash);
-        console.log(`message result is : ${message}`)
-
-        const response_payload = {
-            result: message,
-            error: null,
-            errorData: null
-        }
-        res.send(response_payload);
-    } else {
-        logger.debug('Failed to register the username %s for organization %s with::%s', username, orgName, response);
-        res.json({ success: false, message: response });
-    }
-
-});
 
 // Register and enroll user
 app.post('/register/', async function (req, res) {
-    var username = req.body.username;
+    var email = req.body.email;
     var password = req.body.password;
-    logger.debug('End point : /users');
-    logger.debug('User name : ' + username);
+    logger.debug('End point : /register/');
+    logger.debug('User name : ' + email);
     logger.debug('Org name  : ' + "Thay Son");
     logger.debug('Password  : ' + password);
-    if (!username) {
+    if (!email) {
         res.json(getErrorMessage('\'username\''));
         return;
     }
@@ -169,18 +113,25 @@ app.post('/register/', async function (req, res) {
 
     var token = jwt.sign({
         exp: Math.floor(Date.now() / 1000) + parseInt(constants.jwt_expiretime),
-        username: username,
+        username: email,
         orgName: "Thay Son"
     }, app.get('secret'));
 
-    let response = await helper.getRegisteredUser(username, "thayson", true);
+    let response = await helper.getRegisteredUser(email, "thayson", true);
     var salt = bcrypt.genSaltSync(10)
     var hash = bcrypt.hashSync(req.body.password, salt)
     logger.debug('Password has : ' + hash);
-    logger.debug('-- returned from registering the username %s for organization %s', username, "thayson");
+    logger.debug('-- returned from registering the username %s for organization %s', email, "thayson");
+    var name = req.body.name;
+    var avatar = req.body.avatar;
+    var phone = req.body.phone;
+    var address = req.body.address;
+    var facebook = req.body.facebook;
+    var role = req.body.role;
+    var portfolio = req.body.portfolio;
     if (response && typeof response !== 'string') {
         logger.debug('Successfully registered the username %s for organization %s', username, "thayson");
-        let message = await register.invokeTransaction("mychannel", "thesis", "registerUser", username, hash);
+        let message = await register.invokeTransaction("mychannel", "thesis", "registerUser", name, avatar, email, phone, address, facebook, role, portfolio, hash);
         console.log(`message result is : ${message}`)
 
         const response_payload = {
@@ -197,19 +148,14 @@ app.post('/register/', async function (req, res) {
 
 //login
 app.post('/login', async function (req, res) {
-    var username = req.body.username;
+    var email = req.body.email;
     var password = req.body.password;
     logger.debug('End point : /login');
-    logger.debug('User name : ' + username);
+    logger.debug('User name : ' + email);
     logger.debug('Password  : ' + password);
-    var token = jwt.sign({
-        exp: Math.floor(Date.now() / 1000) + parseInt(constants.jwt_expiretime),
-        username: username,
-        orgName: "Thay Son"
-    }, app.get('secret'));
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    let isUserRegistered = await helper.isUserRegistered(email, "thayson");
     if (isUserRegistered) {
-        let message = await login.query("mychannel", "thesis", "queryUser", username, "thayson");
+        let message = await login.query("mychannel", "thesis", "queryUser", email, "thayson");
         var salt = bcrypt.genSaltSync(10)
         var check = bcrypt.compareSync(password, message.password);
         console.log(check)
@@ -230,7 +176,7 @@ app.post('/login', async function (req, res) {
             })
         }
     } else {
-        res.json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+        res.json({ success: false, message: `User with username ${email} is not registered with thay son, Please register first.` });
     }
 })
 //api info
@@ -276,33 +222,15 @@ app.post('/api/changepassword', async function (req, res) {
         res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
     }
 })
-// change info
-app.post('/api/changeinfo', async function (req, res) {
+//add farm
+app.post('/api/addFarm', async function (req, res) {
     const username = req.username
-    logger.debug('End point : /api/changeinfo');
+    logger.debug('End point : /api/addFarm');
     logger.debug('User name : ' + username);
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
-        let message = await changeinfo.invokeTransaction("mychannel", "thesis", "queryUser", username, req.body.ngaysinh, req.body.username);
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})
-//add user income
-app.post('/api/adduserincome', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/adduserincome');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await adduserincome.invokeTransaction("mychannel", "thesis", username, req.body.description,
-            req.body.amount,
-            req.body.currency,
-            req.body.id_income);
+        let message = await addFarm.invokeTransaction("mychannel", "thesis", username, req.body.name, req.body.description,
+            req.body.address, req.body.phone, req.body.email, req.body.website, req.body.facebook, req.body.logo, req.body.location);
         res.status(200).json({
             result: message,
             error: "Thành công"
@@ -312,14 +240,29 @@ app.post('/api/adduserincome', async function (req, res) {
     }
 })
 
-//see all user income
-app.get('/api/seealluserincome', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/seealluserincome');
+//see info farm base on id
+app.get('/api/farm', async function (req, res) {
+    logger.debug('End point : /api/farm');
+    logger.debug('User name : ' + username);
+    let farmid = req.query.farmid
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await seefarmbaseonid.query("mychannel", "thesis", 'admin', farmid);
+        res.status(200).json({
+            result: message,
+            error: "Thành công"
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+//see info farm all farm
+app.get('/api/allfarm', async function (req, res) {
+    logger.debug('End point : /api/farm');
     logger.debug('User name : ' + username);
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
-        let message = await seealluserincome.query("mychannel", "thesis", username);
+        let message = await seeallfarm.query("mychannel", "thesis", 'admin');
         res.status(200).json({
             result: message,
             error: "Thành công"
@@ -329,184 +272,3 @@ app.get('/api/seealluserincome', async function (req, res) {
     }
 })
 
-//see  user income id
-app.post('/api/seeuserincomeid', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/seeuserincomeid');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await seeuserincomeid.query("mychannel", "thesis", username, req.body.id);
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})
-
-//add user spending
-app.post('/api/adduserspending', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/adduserspending');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await adduserspending.invokeTransaction("mychannel", "thesis", username, req.body.description,
-            req.body.amount,
-            req.body.currency,
-            req.body.id_spending);
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})
-
-//see all user spending
-app.get('/api/seealluserspending', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/seealluserspending');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await seealluserspending.query("mychannel", "thesis", username);
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})
-
-//see  user spending id
-app.post('/api/seeuserspendingid', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/seeuserspendingid');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await seeuserspendingid.query("mychannel", "thesis", username, req.body.id);
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})
-
-//add user target
-app.post('/api/addusertarget', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/addusertarget');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await addusertarget.invokeTransaction("mychannel", "thesis", username,
-            req.body.description,
-            req.body.start_date,
-            req.body.end_date,
-            req.body.amount,
-            req.body.currency,
-            uuidv4());
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})
-
-//see  user target
-app.get('/api/seeallusertarget', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/seeallusertarget');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await seeallusertarget.query("mychannel", "thesis", username);
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})
-
-//add user transaction target
-app.post('/api/addusertransactiontotarget', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/seeallusertarget');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await addusertransactiontotarget.invokeTransaction("mychannel", "thesis", username, req.body.id_target,
-            req.body.amount,
-            req.body.currency,
-            req.body.rate_currency);
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})
-
-//see history transaction has added target
-app.post('/api/seehistorytransactionhasaddedtarget', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/seehistorytransactionhasaddedtarget');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await seehistorytransactionhasaddedtarget.query("mychannel", "thesis", username, req.body.id_target);
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})
-
-//see info target
-app.post('/api/seeinfortarget', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/seeinfortarget');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await seeinfortarget.query("mychannel", "thesis", username, req.body.id);
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})
-
-//see all
-app.get('/api/seeall', async function (req, res) {
-    const username = req.username
-    logger.debug('End point : /api/seeall');
-    logger.debug('User name : ' + username);
-    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
-    if (isUserRegistered) {
-        let message = await seeall.query("mychannel", "thesis", username);
-        res.status(200).json({
-            result: message,
-            error: "Thành công"
-        })
-    } else {
-        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
-    }
-})

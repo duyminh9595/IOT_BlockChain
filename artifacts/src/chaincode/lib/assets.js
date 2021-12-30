@@ -3,10 +3,10 @@
 // SDK Library to asset with writing the logic 
 const { Contract } = require('fabric-contract-api');
 
-class Cs01Contract extends Contract {
+class IOTContract extends Contract {
 
   constructor() {
-    super('Cs01Contract');
+    super('IOTContract');
     this.TxId = ''
   }
 
@@ -17,26 +17,133 @@ class Cs01Contract extends Contract {
   }
 
 
-  //register user
-  async registerUser(ctx, email, password, username, ngaysinh) {
-    const user = {
-      email,
-      password,
-      username,
-      ngaysinh,
-      balance: 0
+  //dang ky nong trai
+  async registerNongTrai(ctx, name, description, address, phone, email, website, facebook, logo
+    , location) {
+    const mspid = await ctx.clientIdentity.getMSPID();
+    const idpeople = await ctx.clientIdentity.getID();
+    const nongtrai = {
+      name, description, address, phone, email, website, facebook, logo
+      , location, mspid,
+      docType: 'NongTrai', idpeople
     };
-    await ctx.stub.putState(email, Buffer.from(JSON.stringify(user)));
-    console.info('============= END : Create User ===========');
+    await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(nongtrai)));
+    console.info('============= END : Create Nong Trai Thanh Cong ===========');
   }
-  //login user
+  //querry nong trai
+  async querryNongTrai(ctx, addressnongtrai) {
+    const nongtraiAsBytes = await ctx.stub.getState(addressnongtrai);
+    if (!nongtraiAsBytes || nongtraiAsBytes.length === 0) {
+      throw new Error(`${nongtraiAsBytes} does not exist`);
+    }
+    console.log(nongtraiAsBytes.toString());
+    return nongtraiAsBytes.toString();
+  }
+  //xem tất cả nông trại
+  async xemTatCaNongTrai(ctx) {
+    let queryString = {};
+    queryString.selector = {};
+    queryString.selector.docType = 'NongTrai'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //them sản phẩm vào nông trại
+  async themsanphamnongtrai(ctx, addressnongtrai, name, description) {
+    const mspid = await ctx.clientIdentity.getMSPID();
+    const nongtraiAsBytes = await ctx.stub.getState(addressnongtrai);
+    if (!nongtraiAsBytes || nongtraiAsBytes.length === 0) {
+      throw new Error(`${nongtraiAsBytes} does not exist`);
+    }
+    const sanpham = {
+      name, description, addressnongtrai, docType: 'Product', mspid
+    }
+    await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(sanpham)));
+    console.info('============= END : Create Nong San cho Nong Trai Thanh Cong ===========');
+  }
+  //xem tat ca san pham cua 1 nong trai
+  async xemTatCaSanPhamCua1NongTrai(ctx, addressnongtrai) {
+    let queryString = {};
+    queryString.selector = {};
+    queryString.selector.addressnongtrai = addressnongtrai
+    queryString.selector.docType = 'Product'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //xem tat ca san pham co
+  async xemTatCaSanPham(ctx) {
+    let queryString = {};
+    queryString.selector = {};
+    queryString.selector.docType = 'Product'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //them 1 khu vuc vao 1 nong trai
+  async addAreaToAFarm(ctx, name, description, addressfarm) {
+    const nongtraiAsBytes = await ctx.stub.getState(addressfarm);
+    if (!nongtraiAsBytes || nongtraiAsBytes.length === 0) {
+      throw new Error(`${nongtraiAsBytes} does not exist`);
+    }
+    const area = {
+      name, description, addressfarm, docType: 'Area',
+    }
+    await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(area)));
+    console.info('============= END : Create Khu Vuc cho Nong Trai Thanh Cong ===========');
+  }
+  //xem tat ca khu vuc cua 1 nong trai
+  async xemTatCaKhuVucCua1NongTrai(ctx, addressfarm) {
+    let queryString = {};
+    queryString.selector = {};
+    queryString.selector.addressfarm = addressfarm
+    queryString.selector.docType = 'Area'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //xem tat ca khu vuc co
+  async xemTatCaArea(ctx) {
+    let queryString = {};
+    queryString.selector = {};
+    queryString.selector.docType = 'Area'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //dang ky nguoi dung
+  async registerUser(ctx, name, avatar, email, phone, address, facebook, role, portfolio, password) {
+    const userAsBytes = await ctx.stub.getState(email);
+    if (!userAsBytes || userAsBytes.length === 0) {
+      const mspid = await ctx.clientIdentity.getMSPID();
+      const idpeople = await ctx.clientIdentity.getID();
+      const user = {
+        name, avatar, email, phone, address, facebook, role, portfolio, mspid, password, docType: 'User', idpeople
+      }
+      await ctx.stub.putState(email, Buffer.from(JSON.stringify(user)));
+      console.info(`${mspid} da dang ky user với email ${email} thành công`);
+    }
+    else {
+      throw new Error(`${userAsBytes} exist in system`);
+    }
+  }
+  //xem tat ca user da dang ky trong to chuc
+  async xemTatCaUserCuaToChuc(ctx) {
+    let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.docType = 'User'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //query user
   async queryUser(ctx, email) {
+    const mspid = await ctx.clientIdentity.getMSPID();
     const userAsBytes = await ctx.stub.getState(email);
     if (!userAsBytes || userAsBytes.length === 0) {
       throw new Error(`${userAsBytes} does not exist`);
     }
-    console.log(userAsBytes.toString());
-    return userAsBytes.toString();
+    const userInfo = JSON.parse(userAsBytes.toString());
+    if (userInfo.mspid === mspid) {
+      return userAsBytes.toString()
+    }
+    throw new Error(`${userAsBytes} does not exist in ${mspid}`);
   }
   //doi mat khau
   async changePassword(ctx, email, password) {
@@ -45,281 +152,216 @@ class Cs01Contract extends Contract {
       throw new Error(`${userAsBytes} does not exist`);
     }
     const userInfo = JSON.parse(userAsBytes.toString());
-    userInfo.password = password;
-    await ctx.stub.putState(email, Buffer.from(JSON.stringify(userInfo)));
-    console.info('============= END : change Password User ===========');
-  }
-  //doi thong tin user
-  async changeUserInfo(ctx, email, ngaysinh, username) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
+    const mspid = await ctx.clientIdentity.getMSPID();
+    if (userInfo.mspid === mspid) {
+      userInfo.password = password;
+      await ctx.stub.putState(email, Buffer.from(JSON.stringify(userInfo)));
+      console.info('============= END : change Password User ===========');
     }
-    const userInfo = JSON.parse(userAsBytes.toString());
-    userInfo.username = username
-    userInfo.ngaysinh = ngaysinh
-    await ctx.stub.putState(email, Buffer.from(JSON.stringify(userInfo)));
-    console.info('============= END : change User Info ===========');
-  }
-  //change balance of user
-  async changeBalanceUser(ctx, email, amount) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
+    else {
+      throw new Error(`${userAsBytes} does not exist in ${mspid}`);
     }
-    const userBalance = JSON.parse(userAsBytes.toString());
-    userBalance.balance = amount;
-    await ctx.stub.putState(email, Buffer.from(JSON.stringify(userBalance)));
-    console.info('============= END : change Balance User ===========');
   }
-  //add income
-  async addIncomeUser(ctx, email, income_name, amount, currency, rate_currency, id_income, date_created) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
-    }
-    const userIncome = {
-      email,
-      date_created,
-      income_name,
-      amount,
-      currency,
-      rate_currency,
-      docType: 'incomeuser',
-      id_income,
-      type: 'add'
-    };
-    try {
 
-      await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(userIncome)));
-
-      const userBalance = JSON.parse(userAsBytes.toString());
-      userBalance.balance = parseInt(userBalance.balance, 10) + parseInt(amount, 10) * parseInt(rate_currency, 10);
-      await ctx.stub.putState(email, Buffer.from(JSON.stringify(userBalance)));
-      console.info('============= END : change Balance User ===========');
-
-      // compose the return values
-      return {
-        key: this.TxId
-      };
+  //create planting season
+  async createplantingseason(ctx, name, addressfarm, email) {
+    const nongtraiAsBytes = await ctx.stub.getState(addressfarm);
+    if (!nongtraiAsBytes || nongtraiAsBytes.length === 0) {
+      throw new Error(`${nongtraiAsBytes} does not exist`);
     }
-    catch (e) {
-      throw new Error(`The tx ${this.TxId} can not be stored: ${e}`);
-    }
-  }
-  //add spending
-  async addSpendingUser(ctx, email, spend_name, amount, currency, rate_currency, id_spending, date_created) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
-    }
-    const userSpending = {
-      email,
-      date_created,
-      spend_name,
-      amount,
-      currency,
-      rate_currency,
-      docType: 'spendinguser',
-      id_spending,
-      type: 'add'
-    };
-    try {
-      await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(userSpending)));
-      const userBalance = JSON.parse(userAsBytes.toString());
-      userBalance.balance = parseInt(userBalance.balance, 10) - parseInt(amount, 10) * parseInt(rate_currency, 10);
-      await ctx.stub.putState(email, Buffer.from(JSON.stringify(userBalance)));
-      // compose the return values
-      return {
-        key: this.TxId
-      };
-    }
-    catch (e) {
-      throw new Error(`The tx ${this.TxId} can not be stored: ${e}`);
-    }
-  }
-  //add target de danh
-  async addTarget(ctx, email, name_target, start_date, end_date, amount, currency, rate_currency, id) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
-    }
+    const mspid = await ctx.clientIdentity.getMSPID();
+    const idpeople = await ctx.clientIdentity.getID();
     let _keyHelper = new Date();
-    const userTarget = {
-      email,
-      name_target,
-      start_date,
-      end_date,
-      amount: amount * rate_currency,
-      current_balance: 0,
-      currency,
-      rate_currency,
-      docType: 'target',
-      id
-    };
+    const plantingseason = {
+      docType: 'PlantingSeason', name, txId: this.TxId, mspid, idpeople, datecreated: _keyHelper, addressfarm, email
+    }
     try {
-      await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(userTarget)));
+      // store the composite key with a the value
+      let indexName = 'year~month~date~mspid~txid'
+      let _keyYearAsString = _keyHelper.getFullYear().toString()
+      let _keyMonthAsString = _keyHelper.getMonth().toString()
+      let _keyDateAsString = _keyHelper.getDate().toString();
+
+      let yearMonthIndexKey = await ctx.stub.createCompositeKey(indexName, [_keyYearAsString, _keyMonthAsString, _keyDateAsString, mspid, this.TxId]);
+
+      //console.info(yearMonthIndexKey, _keyYearAsString, _keyMonthAsString, this.TxId);
+
+      // store the new state
+      await ctx.stub.putState(yearMonthIndexKey, Buffer.from(JSON.stringify(plantingseason)));
 
       // compose the return values
       return {
-        key: this.TxId
+        key: _keyYearAsString + '~' + _keyMonthAsString + '~' + _keyDateAsString + '~' + mspid + '~' + this.TxId
       };
-    }
-    catch (e) {
+
+    } catch (e) {
       throw new Error(`The tx ${this.TxId} can not be stored: ${e}`);
     }
   }
-  //update amount target
-  async updateAmountTarget(ctx, id, amount) {
-    const targetUserAsBytes = await ctx.stub.getState(id);
-    if (!targetUserAsBytes || targetUserAsBytes.length === 0) {
-      throw new Error(`${targetUserAsBytes} does not exist`);
-    }
-    const targetUser = JSON.parse(targetUserAsBytes.toString());
-    targetUser.amount = amount;
-    await ctx.stub.putState(id, Buffer.from(JSON.stringify(targetUser)));
-    console.info('============= END : change target User ===========');
-  }
-  //see all target of an email
-  async seeAllTargetEmail(ctx, email) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
-    }
-    let queryString = {};
-    queryString.selector = {};
-    queryString.selector.docType = 'target';
-    queryString.selector.email = email;
-    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
-    return queryResults; //shim.success(queryResults);
-  }
-  //add transaction to target
-  async addTransactionTarget(ctx, email, id_target, amount, currency, rate_currency, date_created) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
-    }
-    const userAddAmountTarget = {
-      email,
-      date_created,
-      amount,
-      currency,
-      rate_currency,
-      id_target
-    };
-    try {
+  async getCsByYearMonthDate(ctx) {
 
-      const targetUserAsBytes = await ctx.stub.getState(id_target);
-      if (!targetUserAsBytes || targetUserAsBytes.length === 0) {
-        throw new Error(`${targetUserAsBytes} does not exist`);
+    // we use the args option
+    const args = ctx.stub.getArgs();
+
+    // we split the key into single peaces
+    const keyValues = args[1].split('~')
+
+    // collect the keys
+    let keys = []
+    keyValues.forEach(element => keys.push(element))
+
+    // do the query
+    let resultsIterator = await ctx.stub.getStateByPartialCompositeKey('year~month~date~mspid~txid', keys);
+
+    // prepare the result
+    const allResults = [];
+    while (true) {
+      const res = await resultsIterator.next();
+
+      if (res.value) {
+        allResults.push(res.value.value.toString('utf8'));
+
       }
 
-      await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(userAddAmountTarget)));
 
-      const targetUser = JSON.parse(targetUserAsBytes.toString());
-      targetUser.current_balance = parseInt(targetUser.current_balance, 10) + parseInt(amount, 10) * parseInt(rate_currency, 10);
-      await ctx.stub.putState(id_target, Buffer.from(JSON.stringify(targetUser)));
-      // compose the return values
-      return {
-        key: this.TxId
-      };
-    }
-    catch (e) {
-      throw new Error(`The tx ${this.TxId} can not be stored: ${e}`);
+      if (res.done) {
+
+        await resultsIterator.close();
+        return allResults;
+      }
     }
   }
-  //see transaction to target
-  async seeTransactionHasAddedTarget(ctx, email, id_target) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
-    }
+  //get all plating season by msp
+  async getAllPlantingSeasonByMsp(ctx) {
     let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
     queryString.selector = {};
-    queryString.selector.email = email;
-    queryString.selector.id_target = id_target;
+    queryString.selector.mspid = mspid
+    queryString.selector.docType = 'PlantingSeason'
     let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
     return queryResults; //shim.success(queryResults);
   }
-  //see all user income
-  async seeAllUserIncome(ctx, email) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
+  //tao planting
+  async createPlanting(ctx, plantingseason, email, source, description) {
+    const mspid = await ctx.clientIdentity.getMSPID();
+    const idpeople = await ctx.clientIdentity.getID();
+    const args = ctx.stub.getArgs();
+
+    // we split the key into single peaces
+    const keyValues = plantingseason.split('~')
+    console.log(keyValues);
+    // collect the keys
+    let keys = []
+    keyValues.forEach(element => keys.push(element))
+    console.log(keys)
+
+    let resultsIterator = await ctx.stub.getStateByPartialCompositeKey('year~month~date~mspid~txid', keys);
+
+    while (true) {
+      const res = await resultsIterator.next();
+
+      if (res.value) {
+        const resultInfo = JSON.parse(res.value.value.toString('utf8'));
+        if (resultInfo.mspid === mspid) {
+          const userAsBytes = await ctx.stub.getState(email);
+          if (!userAsBytes || userAsBytes.length === 0) {
+            throw new Error(`${userAsBytes} does not exist`);
+          }
+          const userInfo = JSON.parse(userAsBytes.toString());
+          if (userInfo.mspid === mspid) {
+            let _keyHelper = new Date();
+            const doPlanting = {
+              email, source, description, datecreated: _keyHelper, docType: 'DoPlanting', plantingseason, mspid, idpeople
+            }
+            await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
+            console.info('============= END : Create Planting Thanh Cong ===========');
+            return this.txId;
+          }
+          else {
+            throw new Error(`${userAsBytes} does not exist in ${mspid}`);
+          }
+        }
+        else {
+          throw new Error(`${plantingseason} does not belong to ${mspid}`);
+        }
+      }
+      else {
+        throw new Error(`${plantingseason} khong ton tai`);
+      }
     }
+  }
+  //get all planting by msp
+  async getPlantingbymsp(ctx) {
     let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
     queryString.selector = {};
-    queryString.selector.docType = 'incomeuser';
-    queryString.selector.email = email;
+    queryString.selector.mspid = mspid
+    queryString.selector.docType = 'DoPlanting'
     let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
     return queryResults; //shim.success(queryResults);
   }
-  //see all user spending base on income id
-  async seeAllUserSpendingBaseIncomeId(ctx, email, id_income) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
-    }
+  //get all planting by msp and planting season
+  async getPlantingbymspandplantingseason(ctx, plantingseason) {
     let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
     queryString.selector = {};
-    queryString.selector.docType = 'incomeuser';
-    queryString.selector.email = email;
-    queryString.selector.id_income = id_income;
+    queryString.selector.mspid = mspid
+    queryString.selector.docType = 'DoPlanting'
+    queryString.selector.plantingseason = plantingseason
     let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
     return queryResults; //shim.success(queryResults);
   }
-  //see all user spending
-  async seeAllUserSpending(ctx, email) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
+  async createFertilizing(ctx, plantingseason, email, fertilizerType, description) {
+    const mspid = await ctx.clientIdentity.getMSPID();
+    const idpeople = await ctx.clientIdentity.getID();
+    let resultExist = await ctx.stub.getState('year~month~date~mspid~txid', plantingseason);
+    if (!resultExist || resultExist.length === 0) {
+      throw new Error(`${plantingseason} does not exist`);
     }
-    let queryString = {};
-    queryString.selector = {};
-    queryString.selector.docType = 'spendinguser';
-    queryString.selector.email = email;
-    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
-    return queryResults; //shim.success(queryResults);
+    const resultInfo = JSON.parse(resultExist.toString());
+    if (resultInfo.mspid === mspid) {
+      const userAsBytes = await ctx.stub.getState(email);
+      if (!userAsBytes || userAsBytes.length === 0) {
+        throw new Error(`${userAsBytes} does not exist`);
+      }
+      const userInfo = JSON.parse(userAsBytes.toString());
+      if (userInfo.mspid === mspid) {
+        let _keyHelper = new Date();
+        const doPlanting = {
+          email, fertilizerType, description, datecreated: _keyHelper, docType: 'DoFertilizing', plantingseason, mspid
+        }
+        await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
+        console.info('============= END : Create Bón phân cho Nong Trai Thanh Cong ===========');
+      }
+      throw new Error(`${userAsBytes} does not exist in ${mspid}`);
+    }
+    throw new Error(`${plantingseason} does not belong to ${mspid}`);
   }
-  //see all user spending base on spending id
-  async seeAllUserSpendingBaseSpendingId(ctx, email, id_spending) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
+  async createHarvesting(ctx, plantingseason, email, quantity, description, result) {
+    const mspid = await ctx.clientIdentity.getMSPID();
+    const idpeople = await ctx.clientIdentity.getID();
+    let resultExist = await ctx.stub.getState('year~month~date~mspid~txid', plantingseason);
+    if (!resultExist || resultExist.length === 0) {
+      throw new Error(`${plantingseason} does not exist`);
     }
-    let queryString = {};
-    queryString.selector = {};
-    queryString.selector.docType = 'spendinguser';
-    queryString.selector.email = email;
-    queryString.selector.id_spending = id_spending;
-    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
-    return queryResults; //shim.success(queryResults);
-  }
-  //see all include spending and income
-  async seeAllUserTransaction(ctx, email) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
+    const resultInfo = JSON.parse(resultExist.toString());
+    if (resultInfo.mspid === mspid) {
+      const userAsBytes = await ctx.stub.getState(email);
+      if (!userAsBytes || userAsBytes.length === 0) {
+        throw new Error(`${userAsBytes} does not exist`);
+      }
+      const userInfo = JSON.parse(userAsBytes.toString());
+      if (userInfo.mspid === mspid) {
+        let _keyHelper = new Date();
+        const doHarvesting = {
+          email, quantity, description, datecreated: _keyHelper, docType: 'DoHarvesting', plantingseason, mspid, result
+        }
+        await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doHarvesting)));
+        console.info('============= END : Create Thu Hoach cho Nong Trai Thanh Cong ===========');
+      }
+      throw new Error(`${userAsBytes} does not exist in ${mspid}`);
     }
-    let queryString = {};
-    queryString.selector = {};
-    queryString.selector.email = email;
-    queryString.selector.type = 'add'
-    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
-    return queryResults; //shim.success(queryResults);
-  }
-  //see infor target id
-  async seeInforTarget(ctx, email, targetid) {
-    const userAsBytes = await ctx.stub.getState(email);
-    if (!userAsBytes || userAsBytes.length === 0) {
-      throw new Error(`${userAsBytes} does not exist`);
-    }
-    const targetAsbytes = await ctx.stub.getState(targetid);
-    if (!targetAsbytes || targetAsbytes.length === 0) {
-      throw new Error(`${targetAsbytes} does not exist`);
-    }
-    console.log(targetAsbytes.toString());
-    return targetAsbytes.toString();
+    throw new Error(`${plantingseason} does not belong to ${mspid}`);
   }
   async getQueryResultForQueryString(stub, queryString) {
 
@@ -369,6 +411,7 @@ class Cs01Contract extends Contract {
       }
     }
   }
+
 }
 
-module.exports = Cs01Contract
+module.exports = IOTContract

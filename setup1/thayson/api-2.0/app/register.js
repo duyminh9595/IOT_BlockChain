@@ -16,7 +16,7 @@ const helper = require('./helper')
 //     return new MyTransactionEventHandler(transactionId, network, myOrgPeers);
 // }
 
-const invokeTransaction = async (channelName, chaincodeName, fcn, username, password) => {
+const invokeTransaction = async (channelName, chaincodeName, fcn, name, avatar, email, phone, address, facebook, role, portfolio, hash) => {
     try {
         logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
 
@@ -31,11 +31,11 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, username, pass
         console.log(`Wallet path: ${walletPath}`);
 
         // Check to see if we've already enrolled the user.
-        let identity = await wallet.get(username);
+        let identity = await wallet.get(email);
         if (!identity) {
-            console.log(`An identity for the user ${username} does not exist in the wallet, so registering user`);
-            await helper.getRegisteredUser(username, "thayson", true)
-            identity = await wallet.get(username);
+            console.log(`An identity for the user ${email} does not exist in the wallet, so registering user`);
+            await helper.getRegisteredUser(email, "thayson", true)
+            identity = await wallet.get(email);
             console.log('Run the registerUser.js application before retrying');
             return;
         }
@@ -43,7 +43,7 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, username, pass
 
 
         const connectOptions = {
-            wallet, identity: username, discovery: { enabled: true, asLocalhost: false },
+            wallet, identity: email, discovery: { enabled: true, asLocalhost: false },
             eventHandlerOptions: {
                 commitTimeout: 100,
                 strategy: DefaultEventHandlerStrategies.NETWORK_SCOPE_ALLFORTX
@@ -94,10 +94,7 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, username, pass
         if (fcn === "registerUser") {
             result = await contract.submitTransaction(
                 'registerUser',
-                username,
-                password,
-                "",
-                ""
+                name, avatar, email, phone, address, facebook, role, portfolio, hash
             )
         }
         else {

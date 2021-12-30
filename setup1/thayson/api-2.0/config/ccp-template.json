@@ -15,42 +15,40 @@
         "Org${ORG}": {
             "mspid": "Org${ORG}MSP",
             "peers": [
-                "peer0.org${ORG}.example.com",
-                "peer1.org${ORG}.example.com"
+                "peer0.org${ORG}.thesis.com",
+                "peer1.org${ORG}.thesis.com"
             ],
             "certificateAuthorities": [
-                "ca.org${ORG}.example.com"
+                "ca.org${ORG}.thesis.com"
             ]
         }
     },
     "peers": {
-        "peer0.org${ORG}.example.com": {
-            "url": "grpcs://peer0.org1.example.com:${P0PORT}",
+        "peer0.org${ORG}.thesis.com": {
+            "url": "grpcs://peer0.thayson.thesis.com:${P0PORT}",
             "tlsCACerts": {
                 "pem": "${PEERPEM}"
             },
             "grpcOptions": {
-                "ssl-target-name-override": "peer0.org${ORG}.example.com",
-                "hostnameOverride": "peer0.org${ORG}.example.com"
+                "ssl-target-name-override": "peer0.org${ORG}.thesis.com",
+                "hostnameOverride": "peer0.org${ORG}.thesis.com"
             }
         },
-	"peer1.org${ORG}.example.com": {
-            "url": "grpcs://peer1.org1.example.com:${P0PORT1}",
+        "peer1.org${ORG}.thesis.com": {
+            "url": "grpcs://peer1.thayson.thesis.com:${P0PORT1}",
             "tlsCACerts": {
                 "pem": "${PEERPEM1}"
             },
             "grpcOptions": {
-                "ssl-target-name-override": "peer1.org${ORG}.example.com",
-                "hostnameOverride": "peer1.org${ORG}.example.com"
+                "ssl-target-name-override": "peer1.org${ORG}.thesis.com",
+                "hostnameOverride": "peer1.org${ORG}.thesis.com"
             }
         }
-
-	
     },
     "certificateAuthorities": {
-        "ca.org${ORG}.example.com": {
-            "url": "https://ca.org1.example.com:${CAPORT}",
-            "caName": "ca.org${ORG}.example.com",
+        "ca.org${ORG}.thesis.com": {
+            "url": "https://ca.thayson.thesis.com:${CAPORT}",
+            "caName": "ca.org${ORG}.thesis.com",
             "tlsCACerts": {
                 "pem": "${CAPEM}"
             },

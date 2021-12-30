@@ -58,21 +58,6 @@ docker rm artifacts_api_1
 docker exec -it artifacts_api_1 sh
 docker logs artifacts_api_1 -f
 
-http://35.224.10.90:4000/api/addusertransactiontotarget
-http://35.224.10.90:4000/api/adduserspending
-http://35.224.10.90:4000/api/adduserincome
-
-
-# add extra hosts
-extra_hosts:
-      - "orderer.thesis.com:34.71.102.58"
-      - "orderer2.thesis.com:34.71.102.58"
-      - "orderer3.thesis.com:34.71.102.58"
-      - "peer0.thayson.thesis.com:34.71.102.58"
-      - "peer1.thayson.thesis.com:34.71.102.58"
-      - "peer0.cohuong.thesis.com:34.71.102.58"
-      - "peer1.cohuong.thesis.com:34.71.102.58"
-
 
 # code in cli
 docker exec -it cli bash
@@ -92,54 +77,127 @@ peer lifecycle chaincode commit -o orderer.thesis.com:7050 --ordererTLSHostnameO
 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
 --channelID $CHANNEL_NAME --name ${CC_NAME} \
 --peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
---peerAddresses peer0.cohuong.thesis.com:9051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer0.cohuong.thesis.com/tls/ca.crt \
 --version ${VERSION} --sequence ${VERSION} --init-required
 
+//tao nong trai
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["registerNongTrai","Cô Hường","Nông trại Cô Hường là nông trại cung cấp các loại rau củ, nấm rơm chất lượng","10 Huỳnh Văn Nghệ, Bửu Long, Thành phố Biên Hòa, Đồng Nai, Việt Nam","0123456789","vinhphuc@email.com","www.google.com","facebook.com/vinhphuc","https://google.com/imghp","https://www.google.com/maps/@10.9539723,106.7997188,18.92z"]}' --isInit
+
+//xem nong trai by id
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "querryNongTrai","Args":["413f4deccc0b2db7b951ad0d45695edd3a61fbbe86f352a98b12a20da1dd600b"]}' | jq .
+
+//xem tat ca nong trai
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "xemTatCaNongTrai","Args":[]}' | jq .
+
+//key 1: 5af0948e541c00afcafc2731b9bf5bc7c220cd3bc5c9e93179569b68215993b6
+//key 2: 9d9283b28364ff4f8ed1037b7ed3eecbcbd44c8ae9e1422f910933328496a924
+//key 3: 21d883ac7a112571099a228a95246a9f25df4b33bf911627b05b4fbde0d84455
+//them sản phẩm vào nông trại
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["themsanphamnongtrai","5af0948e541c00afcafc2731b9bf5bc7c220cd3bc5c9e93179569b68215993b6","Nấm rơm","Nấm rơm hay nấm mũ rơm là một loài nấm trong họ nấm lớn sinh trưởng và phát triển từ các loại rơm rạ."]}'
 
 peer chaincode invoke -o orderer.thesis.com:7050 \
 --ordererTLSHostnameOverride orderer.thesis.com \
 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
 -C $CHANNEL_NAME -n ${CC_NAME} \
 --peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
---peerAddresses peer0.cohuong.thesis.com:9051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer0.cohuong.thesis.com/tls/ca.crt \
---isInit -c '{"Args":["registerUser","@gmail.com","123456","le quang duy minh","07/06/1995"]}' --isInit
+-c '{"Args":["themsanphamnongtrai","5af0948e541c00afcafc2731b9bf5bc7c220cd3bc5c9e93179569b68215993b6","Đồ ngốk","OK Ngốk"]}'
 
+# Xem nông sản của nông trại 1
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "xemTatCaSanPhamCua1NongTrai","Args":["5af0948e541c00afcafc2731b9bf5bc7c220cd3bc5c9e93179569b68215993b6"]}' | jq .
+
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "xemTatCaSanPhamCua1NongTrai","Args":["9d9283b28364ff4f8ed1037b7ed3eecbcbd44c8ae9e1422f910933328496a924"]}' | jq .
+
+# xem tat ca nông sản
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "xemTatCaSanPham","Args":[]}' | jq .
+
+# key 1: 9d9283b28364ff4f8ed1037b7ed3eecbcbd44c8ae9e1422f910933328496a924
+# key 2: 9d9283b28364ff4f8ed1037b7ed3eecbcbd44c8ae9e1422f910933328496a924
+# key 3: 21d883ac7a112571099a228a95246a9f25df4b33bf911627b05b4fbde0d84455
+
+# them khu vuc cho nong trai
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["addAreaToAFarm","Nhà 1","Nhà trồng nấm rơm","5af0948e541c00afcafc2731b9bf5bc7c220cd3bc5c9e93179569b68215993b6"]}'
 
 peer chaincode invoke -o orderer.thesis.com:7050 \
 --ordererTLSHostnameOverride orderer.thesis.com \
 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
 -C $CHANNEL_NAME -n ${CC_NAME} \
 --peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
---peerAddresses peer0.cohuong.thesis.com:9051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer0.cohuong.thesis.com/tls/ca.crt \
--c '{"Args":["registerUser","duyminh95@gmail.com","123456","le quang duy minh","07/06/1995"]}'
-
-peer chaincode invoke -o orderer.thesis.com:7050 \
---ordererTLSHostnameOverride orderer.thesis.com \
---tls \
---cafile /etc/hyperledger/channel/crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/msp/tlscacerts/tlsca.thesis.com-cert.pem \
--C mychannel -n thesis \
---peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
---peerAddresses peer0.cohuong.thesis.com:9051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer0.cohuong.thesis.com/tls/ca.crt \
--c '{"function": "createCar","Args":["666666", "Audi", "R8", "Red", "Sandip"]}'
-
+-c '{"Args":["addAreaToAFarm","Nhà 1","Nhà đồ ngốk","5af0948e541c00afcafc2731b9bf5bc7c220cd3bc5c9e93179569b68215993b6"]}'
 
 peer chaincode invoke -o orderer.thesis.com:7050 \
 --ordererTLSHostnameOverride orderer.thesis.com \
 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
 -C $CHANNEL_NAME -n ${CC_NAME} \
 --peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
---peerAddresses peer0.cohuong.thesis.com:9051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer0.cohuong.thesis.com/tls/ca.crt \
--c '{"Args":["addIncomeUser","duyminh95@gmail.com","OK1","45000","VND","1","1","12/2/312"]}' 
+-c '{"Args":["addAreaToAFarm","Nhà 2","Nhà trồng nấm mối","5af0948e541c00afcafc2731b9bf5bc7c220cd3bc5c9e93179569b68215993b6"]}'
 
-peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "seeAllUserIncome","Args":["dongok3@gmail.com"]}' | jq .
+# Xem khu vuc  của nông trại 1
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "xemTatCaKhuVucCua1NongTrai","Args":["5af0948e541c00afcafc2731b9bf5bc7c220cd3bc5c9e93179569b68215993b6"]}' | jq .
 
+# Xem tất cả khu vuc 
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "xemTatCaArea","Args":[]}' | jq .
+
+# dang ky nguoi dung
 peer chaincode invoke -o orderer.thesis.com:7050 \
 --ordererTLSHostnameOverride orderer.thesis.com \
 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
 -C $CHANNEL_NAME -n ${CC_NAME} \
 --peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
---peerAddresses peer0.cohuong.thesis.com:9051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer0.cohuong.thesis.com/tls/ca.crt \
--c '{"function": "changePassword","Args":["666666", "Audi", "R8", "Red", "Sandip"]}'
--c  "function": "createCar"'{"Args":["changePassword","kok@gmail.com","cuoi quyen"]}' 
+-c '{"Args":["registerUser","Lê Quang Duy Minh","avatar","duyminh", "phone", "address", "facebook", "role", "portfolio", "password"]}'
+# xem tat ca nguoi dung cua 1 to chuc
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "xemTatCaUserCuaToChuc","Args":[]}' | jq .
+# query user
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "queryUser","Args":["duyminh"]}' | jq .
+# doi mat khau
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["changePassword","duyminh", "123456"]}'
+
+
+# tao vụ mùa mới
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["createplantingseason","Gieo trồng bất hiếu","0c20fd3e0f1e4b9e1229ae3ed0080fbd13942668fca8d8a4da96d997219f9515","duyminh"]}'
+
+# query vu mua
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "getCsByYearMonthDate","Args":["2021~11~30~thaysonMSP~4566f95839248acbddaaf9e444cfdf2f9fd794fef08c22323f920dfd0d31d0ee"]}' | jq .
+# query tat ca vu mua cua organization
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "getAllPlantingSeasonByMsp","Args":[]}' | jq .
+
+# tạo đợt gieo trồng mới
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["createPlanting","2021~11~30~thaysonMSP~7a611737eef7ca9c4b2185ffcfc373127df2435520ce11b5898be832a7358713","duyminh","Nhập giống từ nhà cung cấp B","Nhập giống từ nhà cung cấp B"]}'
+
+# get all dot gieo trong the organization
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "getPlantingbymsp","Args":[]}' | jq .
+
+# get all dot gieo trong theo organization va vu mua
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "getPlantingbymspandplantingseason","Args":["2021~11~30~thaysonMSP~7a611737eef7ca9c4b2185ffcfc373127df2435520ce11b5898be832a7358713"]}' | jq .
+
+
 
 docker exec -it artifacts_api_1 sh
