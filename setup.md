@@ -2,7 +2,7 @@
 docker swarm leave --force
 docker rm -vf $(docker ps -aq) && docker volume prune -f
 docker network prune
-rm -r -f /home/ubuntu/Demo-135
+rm -r -f /home/ubuntu/IOT_BlockChain
 # docker swarm
 cohuong: 35.224.10.90
 thayson orderer: dm org 34.67.248.87
@@ -11,7 +11,7 @@ docker swarm join --token SWMTKN-1-3o12nteh797bjmld5k9q7jahj5xmsnfo31pdv50k0xioc
 docker network create --attachable --driver overlay artifacts_thesis
 
 # remove ca
-cd /home/ubuntu/Demo-135/setup1/thayson
+cd /home/ubuntu/IOT_BlockChain/setup1/thayson
 rm -r -f ../thayson/crypto-config/
 rm -r -f ../thayson/channel-artifacts/*
 rm -r -f ../thayson/create-certificate-with-ca/fabric-ca/
@@ -19,18 +19,18 @@ rm -r -f ../cohuong/crypto-config/
 rm -r -f ../cohuong/create-certificate-with-ca/fabric-ca/
 rm -r -f ../orderer/crypto-config/
 rm -r -f ../orderer/create-certificate-with-ca/fabric-ca/
-rm -r -f /home/ubuntu/Demo-135/
+rm -r -f /home/ubuntu/IOT_BlockChain/
 
 chmod 777 -R *
 git add *
 git commit -m "D"
 git push origin
-git clone https://github.com/duyminh9595/Demo-135.git
+git clone https://github.com/duyminh9595/IOT_BlockChain.git
 duyminh95@gmail.com
 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
 
 # tạo ca
-cd /home/ubuntu/Demo-135/setup1/thayson/create-certificate-with-ca/
+cd /home/ubuntu/IOT_BlockChain/setup1/thayson/create-certificate-with-ca/
 docker-compose up -d
 ./create-certificate-with-ca.sh 
 cd ../../cohuong/create-certificate-with-ca/
@@ -42,13 +42,13 @@ docker-compose up -d
 cd ../../../artifacts/channel/
 ./create-artifacts.sh 
 
-cd /home/ubuntu/Demo-135/setup1/thayson
+cd /home/ubuntu/IOT_BlockChain/setup1/thayson
 docker-compose up -d
-cd /home/ubuntu/Demo-135/setup1/orderer
+cd /home/ubuntu/IOT_BlockChain/setup1/orderer
 docker-compose up -d
-cd /home/ubuntu/Demo-135/setup1/cohuong
+cd /home/ubuntu/IOT_BlockChain/setup1/cohuong
 docker-compose up -d
-cd /home/ubuntu/Demo-135/setup1/thayson/create-certificate-with-ca/
+cd /home/ubuntu/IOT_BlockChain/setup1/thayson/create-certificate-with-ca/
 docker-compose up -d
 
 # api

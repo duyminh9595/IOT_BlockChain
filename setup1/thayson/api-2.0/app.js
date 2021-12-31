@@ -458,7 +458,7 @@ app.post('/api/createfertilizing', async function (req, res) {
     logger.debug('User name : ' + username);
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
-        let message = await addfertilizing.invokeTransaction("mychannel", "thesis", req.body.plantingseason, username,req.body.fertilizerType, req.body.description);
+        let message = await addfertilizing.invokeTransaction("mychannel", "thesis", req.body.plantingseason, username, req.body.fertilizerType, req.body.description);
         res.status(200).json({
             result: message
         })
@@ -501,7 +501,7 @@ app.post('/api/createcaring', async function (req, res) {
     logger.debug('User name : ' + username);
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
-        let message = await addcaring.invokeTransaction("mychannel", "thesis", req.body.plantingseason, username,req.body.method, req.body.description);
+        let message = await addcaring.invokeTransaction("mychannel", "thesis", req.body.plantingseason, username, req.body.method, req.body.description);
         res.status(200).json({
             result: message
         })
@@ -592,7 +592,7 @@ app.post('/api/addevice', async function (req, res) {
     logger.debug('User name : ' + username);
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
-        let message = await adddevice.invokeTransaction("mychannel", "thesis",req.body.addressfarm,username,req.body.addressarea,req.body.name,req.body.description);
+        let message = await adddevice.invokeTransaction("mychannel", "thesis", req.body.addressfarm, username, req.body.addressarea, req.body.name, req.body.description);
         res.status(200).json({
             result: message
         })
@@ -619,9 +619,10 @@ app.get('/api/getalldeviceofaddressfarm', async function (req, res) {
     const username = req.username
     logger.debug('End point : /api/getalldeviceofaddressfarm');
     logger.debug('User name : ' + username);
+    let farmid = req.query.farmid
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
-        let message = await seealldeviceofnodeandaddressfarm.query("mychannel", "thesis", username,req.body.addressfarm);
+        let message = await seealldeviceofnodeandaddressfarm.query("mychannel", "thesis", username, farmid);
         res.status(200).json({
             result: message
         })
@@ -636,7 +637,7 @@ app.get('/api/getalldeviceofaddressarea', async function (req, res) {
     let areaaddress = req.query.areaaddress
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
-        let message = await seealldeviceofnodeandareaaddress.query("mychannel", "thesis", username,areaaddress);
+        let message = await seealldeviceofnodeandareaaddress.query("mychannel", "thesis", username, areaaddress);
         res.status(200).json({
             result: message
         })
@@ -651,7 +652,7 @@ app.post('/api/adddatatodevice', async function (req, res) {
     logger.debug('User name : ' + username);
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
-        let message = await adddatatodevice.invokeTransaction("mychannel", "thesis",username,req.body.deviceaddress,req.body.nhietdo,req.body.doam);
+        let message = await adddatatodevice.invokeTransaction("mychannel", "thesis", username, req.body.deviceaddress, req.body.nhietdo, req.body.doam);
         res.status(200).json({
             result: message
         })
@@ -666,7 +667,7 @@ app.get('/api/getinfohassenttodevice', async function (req, res) {
     let deviceaddress = req.query.deviceaddress
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
-        let message = await seeinfohassendtodevice.query("mychannel", "thesis", username,deviceaddress);
+        let message = await seeinfohassendtodevice.query("mychannel", "thesis", username, deviceaddress);
         res.status(200).json({
             result: message
         })
