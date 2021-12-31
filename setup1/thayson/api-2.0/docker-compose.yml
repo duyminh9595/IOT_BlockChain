@@ -12,9 +12,9 @@ services:
     ports:
       - 4000:4000
     extra_hosts:
-      - "orderer.thesis.com:23.251.145.253"
-      - "orderer2.thesis.com:23.251.145.253"
-      - "orderer3.thesis.com:23.251.145.253"
-      - "peer0.thayson.thesis.com:23.251.145.253"
-      - "peer1.thayson.thesis.com:23.251.145.253"
-      - "ca.thayson.thesis.com:23.251.145.253"
+      - "orderer.thesis.com:34.136.122.109"
+      - "orderer2.thesis.com:34.136.122.109"
+      - "orderer3.thesis.com:34.136.122.109"
+      - "peer0.thayson.thesis.com:34.136.122.109"
+      - "peer1.thayson.thesis.com:34.136.122.109"
+      - "ca.thayson.thesis.com:34.136.122.109"

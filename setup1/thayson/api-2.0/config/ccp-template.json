@@ -34,7 +34,7 @@
                 "hostnameOverride": "peer0.org${ORG}.example.com"
             }
         },
-        "peer1.org${ORG}.example.com": {
+	"peer1.org${ORG}.example.com": {
             "url": "grpcs://peer1.org1.example.com:${P0PORT1}",
             "tlsCACerts": {
                 "pem": "${PEERPEM1}"
@@ -44,6 +44,8 @@
                 "hostnameOverride": "peer1.org${ORG}.example.com"
             }
         }
+
+	
     },
     "certificateAuthorities": {
         "ca.org${ORG}.example.com": {

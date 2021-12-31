@@ -40,8 +40,6 @@ Organizations:
             - Host: peer0.thayson.thesis.com
               Port: 7051
 
-    
-    
 
 Capabilities:
     Channel: &ChannelCapabilities

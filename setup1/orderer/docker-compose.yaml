@@ -38,7 +38,7 @@ services:
       - ../../artifacts/channel/genesis.block:/var/hyperledger/orderer/genesis.block
       - ./crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/msp:/var/hyperledger/orderer/msp
       - ./crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/tls:/var/hyperledger/orderer/tls
-  
+
   
   orderer2.thesis.com:
     container_name: orderer2.thesis.com

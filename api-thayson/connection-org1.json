@@ -1,0 +1,60 @@
+{
+    "name": "thesis-network",
+    "version": "1.0.0",
+    "client": {
+        "organization": "thayson",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300"
+                }
+            }
+        }
+    },
+    "organizations": {
+        "thayson": {
+            "mspid": "thaysonMSP",
+            "peers": [
+                "peer0.thayson.thesis.com",
+                "peer1.thayson.thesis.com"
+            ],
+            "certificateAuthorities": [
+                "ca.thayson.thesis.com"
+            ]
+        }
+    },
+    "peers": {
+        "peer0.thayson.thesis.com":{
+            "url": "grpcs://localhost:7051",
+            "grpcOption": {
+                "ssl-target-name-override": "peer0.thayson.thesis.com",
+                "hostnameOverride": "peer0.thayson.thesis.com"
+            },
+            "tlsCACerts": {
+                "path": "../thesis-network/organizations/peerOrganizations/thayson.thesis.com/tlsca/tlsca.thayson.thesis.com-cert.pem"
+            }
+        },
+        "peer1.thayson.thesis.com":{
+            "url": "grpcs://localhost:8051",
+            "grpcOption": {
+                "ssl-target-name-override": "peer1.thayson.thesis.com",
+                "hostnameOverride": "peer1.thayson.thesis.com"
+            },
+            "tlsCACerts": {
+                "path": "../thesis-network/organizations/peerOrganizations/thayson.thesis.com/tlsca/tlsca.thayson.thesis.com-cert.pem"
+            }
+        }
+    },
+    "certificateAuthorities": {
+        "ca.thayson.thesis.com": {
+            "url": "https://localhost:7054",
+            "caName": "ca.thayson.thesis.com",
+            "httpOptions": {
+                "verify": false
+            },
+            "tlsCACerts": {
+                "path": "../thesis-network/organizations/peerOrganizations/thayson.thesis.com/ca/ca.thayson.thesis.com-cert.pem"
+            }
+        }
+    }
+}

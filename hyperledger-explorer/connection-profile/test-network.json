@@ -1,0 +1,58 @@
+{
+	"name": "test-network",
+	"version": "1.0.0",
+	"client": {
+		"tlsEnable": true,
+		"adminCredential": {
+			"id": "admin",
+			"password": "adminpw"
+		},
+		"enableAuthentication": true,
+		"organization": "thaysonMSP",
+		"connection": {
+			"timeout": {
+				"peer": {
+					"endorser": "300"
+				},
+				"orderer": "300"
+			}
+		}
+	},
+	"channels": {
+		"mychannel": {
+			"peers": {
+				"peer0.thayson.thesis.com": {},
+				"peer1.thayson.thesis.com": {}
+			}
+		}
+	},
+	"organizations": {
+		"thaysonMSP": {
+			"mspid": "thaysonMSP",
+			"adminPrivateKey": {
+				"path": "/tmp/crypto/users/Admin@thayson.thesis.com/msp/keystore/16c8790e5b0b5cb46373b22cf8eb0c6789b69a157b9bbdd413d78857340c7d49_sk"
+			},
+			"peers": [
+				"peer0.thayson.thesis.com",
+				"peer1.thayson.thesis.com"
+			],
+			"signedCert": {
+				"path": "/tmp/crypto/users/Admin@thayson.thesis.com/msp/signcerts/cert.pem"
+			}
+		}
+	},
+	"peers": {
+		"peer0.thayson.thesis.com": {
+			"tlsCACerts": {
+				"path": "/tmp/crypto/peers/peer0.thayson.thesis.com/tls/ca.crt"
+			},
+			"url": "grpcs://peer0.thayson.thesis.com:7051"
+		},
+		"peer1.thayson.thesis.com": {
+			"tlsCACerts": {
+				"path": "/tmp/crypto/peers/peer1.thayson.thesis.com/tls/ca.crt"
+			},
+			"url": "grpcs://peer1.thayson.thesis.com:8051"
+		}
+	}
+}
