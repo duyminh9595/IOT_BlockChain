@@ -84,13 +84,19 @@ class IOTContract extends Contract {
     if (!nongtraiAsBytes || nongtraiAsBytes.length === 0) {
       throw new Error(`${nongtraiAsBytes} does not exist`);
     }
+    const nongtraiInfo = JSON.parse(nongtraiAsBytes.toString());
     const idpeople = await ctx.clientIdentity.getID();
     const mspid = await ctx.clientIdentity.getMSPID();
-    const area = {
-      name, description, addressfarm, docType: 'Area', mspid, idpeople
+    if (nongtraiInfo.mspid === mspid) {
+      const area = {
+        name, description, addressfarm, docType: 'Area', mspid, idpeople
+      }
+      await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(area)));
+      console.info('============= END : Create Khu Vuc cho Nong Trai Thanh Cong ===========');
     }
-    await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(area)));
-    console.info('============= END : Create Khu Vuc cho Nong Trai Thanh Cong ===========');
+    else {
+      throw new Error(`${nongtraiAsBytes} does not exist`);
+    }
   }
   //xem tat ca khu vuc cua 1 node
   async xemTatCaKhuVucCua1Node(ctx) {
@@ -183,32 +189,38 @@ class IOTContract extends Contract {
       throw new Error(`${nongtraiAsBytes} does not exist`);
     }
     const mspid = await ctx.clientIdentity.getMSPID();
-    const idpeople = await ctx.clientIdentity.getID();
-    let _keyHelper = new Date();
-    const plantingseason = {
-      docType: 'PlantingSeason', name, txId: this.TxId, mspid, idpeople, datecreated: _keyHelper, addressfarm, email
+    const nongtraiInfo = JSON.parse(nongtraiAsBytes.toString());
+    if (nongtraiInfo.mspid === mspid) {
+      const idpeople = await ctx.clientIdentity.getID();
+      let _keyHelper = new Date();
+      const plantingseason = {
+        docType: 'PlantingSeason', name, txId: this.TxId, mspid, idpeople, datecreated: _keyHelper, addressfarm, email
+      }
+      try {
+        // store the composite key with a the value
+        let indexName = 'year~month~date~mspid~txid'
+        let _keyYearAsString = _keyHelper.getFullYear().toString()
+        let _keyMonthAsString = _keyHelper.getMonth().toString()
+        let _keyDateAsString = _keyHelper.getDate().toString();
+
+        let yearMonthIndexKey = await ctx.stub.createCompositeKey(indexName, [_keyYearAsString, _keyMonthAsString, _keyDateAsString, mspid, this.TxId]);
+
+        //console.info(yearMonthIndexKey, _keyYearAsString, _keyMonthAsString, this.TxId);
+
+        // store the new state
+        await ctx.stub.putState(yearMonthIndexKey, Buffer.from(JSON.stringify(plantingseason)));
+
+        // compose the return values
+        return {
+          key: _keyYearAsString + '~' + _keyMonthAsString + '~' + _keyDateAsString + '~' + mspid + '~' + this.TxId
+        };
+
+      } catch (e) {
+        throw new Error(`The tx ${this.TxId} can not be stored: ${e}`);
+      }
     }
-    try {
-      // store the composite key with a the value
-      let indexName = 'year~month~date~mspid~txid'
-      let _keyYearAsString = _keyHelper.getFullYear().toString()
-      let _keyMonthAsString = _keyHelper.getMonth().toString()
-      let _keyDateAsString = _keyHelper.getDate().toString();
-
-      let yearMonthIndexKey = await ctx.stub.createCompositeKey(indexName, [_keyYearAsString, _keyMonthAsString, _keyDateAsString, mspid, this.TxId]);
-
-      //console.info(yearMonthIndexKey, _keyYearAsString, _keyMonthAsString, this.TxId);
-
-      // store the new state
-      await ctx.stub.putState(yearMonthIndexKey, Buffer.from(JSON.stringify(plantingseason)));
-
-      // compose the return values
-      return {
-        key: _keyYearAsString + '~' + _keyMonthAsString + '~' + _keyDateAsString + '~' + mspid + '~' + this.TxId
-      };
-
-    } catch (e) {
-      throw new Error(`The tx ${this.TxId} can not be stored: ${e}`);
+    else {
+      throw new Error(`${nongtraiAsBytes} does not exist in ${mspid}`);
     }
   }
   async getCsByYearMonthDate(ctx) {
@@ -488,7 +500,7 @@ class IOTContract extends Contract {
           if (userInfo.mspid === mspid) {
             let _keyHelper = new Date();
             const doPlanting = {
-              email, quantity, description, datecreated: _keyHelper, docType: 'DoHarvesting', plantingseason, mspid, idpeople,result
+              email, quantity, description, datecreated: _keyHelper, docType: 'DoHarvesting', plantingseason, mspid, idpeople, result
             }
             await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
             console.info('============= END : Create Planting Thanh Cong ===========');
@@ -529,8 +541,7 @@ class IOTContract extends Contract {
     return queryResults; //shim.success(queryResults);
   }
   //them thiet bi
-  async addDevice(ctx,addressfarm,email,location,name,description)
-  {
+  async addDevice(ctx, addressfarm, email, location, name, description) {
     const locationAsBytes = await ctx.stub.getState(location);
     if (!locationAsBytes || locationAsBytes.length === 0) {
       throw new Error(`${locationAsBytes} does not exist`);
@@ -543,9 +554,9 @@ class IOTContract extends Contract {
     const mspid = await ctx.clientIdentity.getMSPID();
     const idpeople = await ctx.clientIdentity.getID();
     const locationInfo = JSON.parse(locationAsBytes.toString());
-    if (userInfo.mspid === mspid && locationInfo.mspid===mspid && locationInfo.addressfarm===addressfarm) {
+    if (userInfo.mspid === mspid && locationInfo.mspid === mspid && locationInfo.addressfarm === addressfarm) {
       const device = {
-      addressfarm, description, location, docType: 'Device', mspid, idpeople,name
+        addressfarm, description, location, docType: 'Device', mspid, idpeople, name
       }
       await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(device)));
       return this.txId
@@ -565,7 +576,7 @@ class IOTContract extends Contract {
     return queryResults; //shim.success(queryResults);
   }
   //get all thiet bi base on mspid and farm address
-  async getAllDeviceBaseOnMSPAndFarmAddress(ctx,addressfarm) {
+  async getAllDeviceBaseOnMSPAndFarmAddress(ctx, addressfarm) {
     let queryString = {};
     const mspid = await ctx.clientIdentity.getMSPID();
     queryString.selector = {};
@@ -576,7 +587,7 @@ class IOTContract extends Contract {
     return queryResults; //shim.success(queryResults);
   }
   //get all thiet bi base on mspid and area address
-  async getAllDeviceBaseOnMSPAndAreaAddress(ctx,location) {
+  async getAllDeviceBaseOnMSPAndAreaAddress(ctx, location) {
     let queryString = {};
     const mspid = await ctx.clientIdentity.getMSPID();
     queryString.selector = {};
@@ -586,8 +597,7 @@ class IOTContract extends Contract {
     let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
     return queryResults; //shim.success(queryResults);
   }
-  async sendInfoToDevice(ctx,deviceid,nhietdo,doam)
-  {
+  async sendInfoToDevice(ctx, deviceid, nhietdo, doam) {
     const deviceAsBytes = await ctx.stub.getState(deviceid);
     if (!deviceAsBytes || deviceAsBytes.length === 0) {
       throw new Error(`${deviceAsBytes} does not exist`);
@@ -596,7 +606,7 @@ class IOTContract extends Contract {
     const idpeople = await ctx.clientIdentity.getID();
     let _keyHelper = new Date();
     const dataDevice = {
-      docType: 'DataDevice', txId: this.TxId, mspid, idpeople, datecreated: _keyHelper, nhietdo, doam,deviceid
+      docType: 'DataDevice', txId: this.TxId, mspid, idpeople, datecreated: _keyHelper, nhietdo, doam, deviceid
     }
     try {
       // store the composite key with a the value

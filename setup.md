@@ -7,7 +7,7 @@ rm -r -f /home/ubuntu/IOT_BlockChain
 cohuong: 34.132.154.152
 thayson orderer: dm org 34.121.207.85
 docker swarm init --advertise-addr 34.121.207.85
-docker swarm join --token SWMTKN-1-3o12nteh797bjmld5k9q7jahj5xmsnfo31pdv50k0xiocnt1b6-4grmq0yg45g5oli1bxmgeq8sd 34.67.248.87:2377 --advertise-addr 35.224.10.90
+docker swarm join --token SWMTKN-1-3ogumfkl4ep24jh33zj0arbn4osj3emky3h61alp2m0shvto83-35pdxzkefl69so0p2uh1xz6xc 34.121.207.85:2377 --advertise-addr 34.132.154.152
 docker network create --attachable --driver overlay artifacts_thesis
 
 # remove ca
@@ -92,6 +92,8 @@ peer lifecycle chaincode commit -o orderer.thesis.com:7050 --ordererTLSHostnameO
 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
 --channelID $CHANNEL_NAME --name ${CC_NAME} \
 --peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+--peerAddresses peer0.cohuong.thesis.com:9051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer0.cohuong.thesis.com/tls/ca.crt \
+--signature-policy "OR('thaysonMSP.member', 'cohuongMSP.member')" \
 --version ${VERSION} --sequence ${VERSION} --init-required
 
 

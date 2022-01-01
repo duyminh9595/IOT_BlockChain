@@ -75,6 +75,7 @@ approveForMycohuong() {
         --ordererTLSHostnameOverride orderer.thesis.com --tls $CORE_PEER_TLS_ENABLED \
         --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name ${CC_NAME} \
         --version ${VERSION} --init-required --package-id ${PACKAGE_ID} \
+        --signature-policy "OR('thaysonMSP.member', 'cohuongMSP.member')" \
         --sequence ${VERSION}
 
     echo "===================== chaincode approved from org 2 ===================== "
