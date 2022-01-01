@@ -28,4 +28,7 @@ configtxgen -profile BasicChannel -configPath . -outputCreateChannelTx ./mychann
 echo "#######    Generating anchor peer update for thaysonMSP  ##########"
 configtxgen -profile BasicChannel -configPath . -outputAnchorPeersUpdate ./thaysonMSPanchors.tx -channelID $CHANNEL_NAME -asOrg thaysonMSP
 
+echo "#######    Generating anchor peer update for cohuongMSP  ##########"
+configtxgen -profile BasicChannel -configPath . -outputAnchorPeersUpdate ./cohuongMSPanchors.tx -channelID $CHANNEL_NAME -asOrg cohuongMSP
+
 

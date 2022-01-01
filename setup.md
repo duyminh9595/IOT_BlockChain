@@ -4,9 +4,9 @@ docker rm -vf $(docker ps -aq) && docker volume prune -f
 docker network prune
 rm -r -f /home/ubuntu/IOT_BlockChain
 # docker swarm
-cohuong: 35.224.10.90
-thayson orderer: dm org 34.67.248.87
-docker swarm init --advertise-addr 34.67.248.87
+cohuong: 34.132.154.152
+thayson orderer: dm org 34.121.207.85
+docker swarm init --advertise-addr 34.121.207.85
 docker swarm join --token SWMTKN-1-3o12nteh797bjmld5k9q7jahj5xmsnfo31pdv50k0xiocnt1b6-4grmq0yg45g5oli1bxmgeq8sd 34.67.248.87:2377 --advertise-addr 35.224.10.90
 docker network create --attachable --driver overlay artifacts_thesis
 
@@ -65,13 +65,13 @@ http://35.224.10.90:4000/api/adduserincome
 
 # add extra hosts
 extra_hosts:
-      - "orderer.thesis.com:34.71.102.58"
-      - "orderer2.thesis.com:34.71.102.58"
-      - "orderer3.thesis.com:34.71.102.58"
-      - "peer0.thayson.thesis.com:34.71.102.58"
-      - "peer1.thayson.thesis.com:34.71.102.58"
-      - "peer0.cohuong.thesis.com:34.71.102.58"
-      - "peer1.cohuong.thesis.com:34.71.102.58"
+      - "orderer.thesis.com:34.121.207.85"
+      - "orderer2.thesis.com:34.121.207.85"
+      - "orderer3.thesis.com:34.121.207.85"
+      - "peer0.thayson.thesis.com:34.121.207.85"
+      - "peer1.thayson.thesis.com:34.121.207.85"
+      - "peer0.cohuong.thesis.com:34.132.154.152"
+      - "peer1.cohuong.thesis.com:34.132.154.152"
 
 
 # code in cli

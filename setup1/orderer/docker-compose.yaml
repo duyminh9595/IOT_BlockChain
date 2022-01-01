@@ -38,6 +38,14 @@ services:
       - ../../artifacts/channel/genesis.block:/var/hyperledger/orderer/genesis.block
       - ./crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/msp:/var/hyperledger/orderer/msp
       - ./crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/tls:/var/hyperledger/orderer/tls
+    extra_hosts:
+      - "orderer.thesis.com:34.121.207.85"
+      - "orderer2.thesis.com:34.121.207.85"
+      - "orderer3.thesis.com:34.121.207.85"
+      - "peer0.thayson.thesis.com:34.121.207.85"
+      - "peer1.thayson.thesis.com:34.121.207.85"
+      - "peer0.cohuong.thesis.com:34.132.154.152"
+      - "peer1.cohuong.thesis.com:34.132.154.152"
 
   
   orderer2.thesis.com:
@@ -74,6 +82,14 @@ services:
       - ../../artifacts/channel/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
       - ./crypto-config/ordererOrganizations/thesis.com/orderers/orderer2.thesis.com/msp:/var/hyperledger/orderer/msp
       - ./crypto-config/ordererOrganizations/thesis.com/orderers/orderer2.thesis.com/tls:/var/hyperledger/orderer/tls
+    extra_hosts:
+      - "orderer.thesis.com:34.121.207.85"
+      - "orderer2.thesis.com:34.121.207.85"
+      - "orderer3.thesis.com:34.121.207.85"
+      - "peer0.thayson.thesis.com:34.121.207.85"
+      - "peer1.thayson.thesis.com:34.121.207.85"
+      - "peer0.cohuong.thesis.com:34.132.154.152"
+      - "peer1.cohuong.thesis.com:34.132.154.152"
 
 
 
@@ -111,4 +127,12 @@ services:
       - ../../artifacts/channel/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
       - ./crypto-config/ordererOrganizations/thesis.com/orderers/orderer3.thesis.com/msp:/var/hyperledger/orderer/msp
       - ./crypto-config/ordererOrganizations/thesis.com/orderers/orderer3.thesis.com/tls:/var/hyperledger/orderer/tls
+    extra_hosts:
+      - "orderer.thesis.com:34.121.207.85"
+      - "orderer2.thesis.com:34.121.207.85"
+      - "orderer3.thesis.com:34.121.207.85"
+      - "peer0.thayson.thesis.com:34.121.207.85"
+      - "peer1.thayson.thesis.com:34.121.207.85"
+      - "peer0.cohuong.thesis.com:34.132.154.152"
+      - "peer1.cohuong.thesis.com:34.132.154.152"
 
