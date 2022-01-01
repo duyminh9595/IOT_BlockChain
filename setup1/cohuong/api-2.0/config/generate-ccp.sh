@@ -30,11 +30,11 @@ function yaml_ccp {
 }
 
 ORG=1
-P0PORT=7051
-CAPORT=7054
-P0PORT1=8051
-PEERPEM=../../crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer0.cohuong.thesis.com/tls/tlscacerts/tls-localhost-7054-ca-cohuong-thesis-com.pem
-PEERPEM1=../../crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer1.cohuong.thesis.com/tls/tlscacerts/tls-localhost-7054-ca-cohuong-thesis-com.pem
+P0PORT=9051
+CAPORT=8054
+P0PORT1=10051
+PEERPEM=../../crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer0.cohuong.thesis.com/tls/tlscacerts/tls-localhost-8054-ca-cohuong-thesis-com.pem
+PEERPEM1=../../crypto-config/peerOrganizations/cohuong.thesis.com/peers/peer1.cohuong.thesis.com/tls/tlscacerts/tls-localhost-8054-ca-cohuong-thesis-com.pem
 CAPEM=../../crypto-config/peerOrganizations/cohuong.thesis.com/msp/tlscacerts/ca.crt
 
 echo "$(json_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM $PEERPEM1 $P0PORT1)" > connection-org1.json
