@@ -64,6 +64,7 @@ services:
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/crypto/peer/msp
     depends_on:
       - couchdb0
+      - logger
     ports:
       - 7051:7051
     volumes:
@@ -73,6 +74,10 @@ services:
       - ./:/etc/hyperledger/channel/
     networks:
       - thesis
+    logging:
+      driver: fluentd
+      options:
+        tag: docker.{{.ID}}
     extra_hosts:
       - "orderer.thesis.com:34.121.207.85"
       - "orderer2.thesis.com:34.121.207.85"
@@ -122,6 +127,13 @@ services:
       - ./crypto-config/peerOrganizations/thayson.thesis.com/peers/peer1.thayson.thesis.com/tls:/etc/hyperledger/crypto/peer/tls
       - /var/run/:/host/var/run/
       - ./:/etc/hyperledger/channel/
+    depends_on:
+      - couchdb1
+      - logger
+    logging:
+      driver: fluentd
+      options:
+        tag: docker.{{.ID}}
     networks:
       - thesis
     extra_hosts:
@@ -157,6 +169,10 @@ services:
     command: /bin/bash
     networks:
       - thesis
+    logging:
+      driver: fluentd
+      options:
+        tag: docker.{{.ID}}
     volumes:
       - /var/run/:/host/var/run/
       # - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
@@ -171,4 +187,18 @@ services:
       - "peer1.thayson.thesis.com:34.121.207.85"
       - "peer0.cohuong.thesis.com:34.132.154.152"
       - "peer1.cohuong.thesis.com:34.132.154.152"
+  
+  logger:
+    container_name: fluentd
+    image: dvladnik/fluentd-ui
+    ports:
+      - "24224:24224"
+      - "9292:9292"  
+    networks:
+      - thesis
+    volumes:
+      - ./fluentd/log:/fluentd/log
+      - ./fluentd/:/fluentd/etc
+    environment:
+      FLUENTD_CONF: fluentd.conf 
 

@@ -27,7 +27,7 @@ git commit -m "D"
 git push origin
 git clone https://github.com/duyminh9595/IOT_BlockChain.git
 duyminh95@gmail.com
-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
+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
 
 # tạo ca
 cd /home/ubuntu/IOT_BlockChain/setup1/thayson/create-certificate-with-ca/
