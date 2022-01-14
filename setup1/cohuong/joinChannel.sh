@@ -12,7 +12,6 @@ setGlobalsForPeer0cohuong() {
     export CORE_PEER_ADDRESS=localhost:9051
 
 }
-
 setGlobalsForPeer1cohuong() {
     export CORE_PEER_LOCALMSPID="cohuongMSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_cohuong_CA
@@ -20,7 +19,6 @@ setGlobalsForPeer1cohuong() {
     export CORE_PEER_ADDRESS=localhost:10051
 
 }
-
 fetchChannelBlock() {
     rm -rf ./channel-artifacts/*
     setGlobalsForPeer0cohuong
@@ -29,9 +27,6 @@ fetchChannelBlock() {
         --ordererTLSHostnameOverride orderer.thesis.com \
         -c $CHANNEL_NAME --tls --cafile $ORDERER_CA
 }
-
-# fetchChannelBlock
-
 joinChannel() {
     setGlobalsForPeer0cohuong
     peer channel join -b ./channel-artifacts/$CHANNEL_NAME.block
@@ -40,8 +35,6 @@ joinChannel() {
     peer channel join -b ./channel-artifacts/$CHANNEL_NAME.block
 
 }
-
-# joinChannel
 
 updateAnchorPeers() {
     setGlobalsForPeer0cohuong
