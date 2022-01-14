@@ -11,26 +11,22 @@ setGlobalsForPeer0thayson(){
     export CORE_PEER_MSPCONFIGPATH=${PWD}/crypto-config/peerOrganizations/thayson.thesis.com/users/Admin@thayson.thesis.com/msp
     export CORE_PEER_ADDRESS=localhost:7051
 }
-
 setGlobalsForPeer1thayson(){
     export CORE_PEER_LOCALMSPID="thaysonMSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_thayson_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/crypto-config/peerOrganizations/thayson.thesis.com/users/Admin@thayson.thesis.com/msp
     export CORE_PEER_ADDRESS=localhost:8051
 }
-
 createChannel(){
     rm -rf ./channel-artifacts/*
     setGlobalsForPeer0thayson
-    
+ 
     # Replace localhost with your orderer's vm IP address
-    peer channel create -o 34.121.207.85:7050 -c $CHANNEL_NAME \
+    peer channel create -o ip_of_orderer:7050 -c $CHANNEL_NAME \
     --ordererTLSHostnameOverride orderer.thesis.com \
     -f ./../../artifacts/channel/${CHANNEL_NAME}.tx --outputBlock ./channel-artifacts/${CHANNEL_NAME}.block \
     --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
 }
-
-
 joinChannel(){
     setGlobalsForPeer0thayson
     peer channel join -b ./channel-artifacts/$CHANNEL_NAME.block
@@ -39,7 +35,6 @@ joinChannel(){
     peer channel join -b ./channel-artifacts/$CHANNEL_NAME.block
     
 }
-
 updateAnchorPeers(){
     setGlobalsForPeer0thayson
     peer channel update -o ip_of_orderer:7050 --ordererTLSHostnameOverride orderer.thesis.com -c $CHANNEL_NAME -f \
