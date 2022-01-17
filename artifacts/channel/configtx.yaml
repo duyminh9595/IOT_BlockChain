@@ -163,6 +163,26 @@ Profiles:
             Capabilities:
                 <<: *ApplicationCapabilities
 
+    ChannelOnlyThaySon:
+        Consortium: ThaySonConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *thayson
+            Capabilities:
+                <<: *ApplicationCapabilities
+
+    ChannelOnlyCoHuong:
+        Consortium: CoHuongConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *cohuong
+            Capabilities:
+                <<: *ApplicationCapabilities
+
     OrdererGenesis:
         <<: *ChannelDefaults
         Capabilities:
@@ -198,3 +218,9 @@ Profiles:
                 Organizations:
                 - *thayson
                 - *cohuong
+            ThaySonConsortium:
+                Organizations:
+                - *thayson
+            CoHuongConsortium:
+                Organizations:
+                - *thayson

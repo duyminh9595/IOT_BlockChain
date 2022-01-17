@@ -1,0 +1,1 @@
+[31m2022-01-17 06:24:57.790 UTC [main] InitCmd -> ERRO 001[0m Fatal error when initializing core config : FABRIC_CFG_PATH /home/ubuntu/IOT_BlockChain/../../artifacts/channel/config/ does not exist

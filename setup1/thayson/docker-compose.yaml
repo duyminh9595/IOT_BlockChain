@@ -70,14 +70,7 @@ services:
       driver: fluentd
       options:
         tag: docker.{{.ID}}
-    extra_hosts:
-      - "orderer.thesis.com:34.121.207.85"
-      - "orderer2.thesis.com:34.121.207.85"
-      - "orderer3.thesis.com:34.121.207.85"
-      - "peer0.thayson.thesis.com:34.121.207.85"
-      - "peer1.thayson.thesis.com:34.121.207.85"
-      - "peer0.cohuong.thesis.com:34.132.154.152"
-      - "peer1.cohuong.thesis.com:34.132.154.152"
+
 
 
   peer1.thayson.thesis.com:
@@ -128,14 +121,7 @@ services:
         tag: docker.{{.ID}}
     networks:
       - thesis
-    extra_hosts:
-      - "orderer.thesis.com:34.121.207.85"
-      - "orderer2.thesis.com:34.121.207.85"
-      - "orderer3.thesis.com:34.121.207.85"
-      - "peer0.thayson.thesis.com:34.121.207.85"
-      - "peer1.thayson.thesis.com:34.121.207.85"
-      - "peer0.cohuong.thesis.com:34.132.154.152"
-      - "peer1.cohuong.thesis.com:34.132.154.152"
+
 
   cli:
     container_name: cli
@@ -161,24 +147,13 @@ services:
     command: /bin/bash
     networks:
       - thesis
-    logging:
-      driver: fluentd
-      options:
-        tag: docker.{{.ID}}
     volumes:
       - /var/run/:/host/var/run/
       # - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
       - ./crypto-config/peerOrganizations/thayson.thesis.com/:/etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/
       - ./../cohuong/crypto-config/peerOrganizations/cohuong.thesis.com/:/etc/hyperledger/channel/crypto-config/peerOrganizations/cohuong.thesis.com/
       - ./../orderer/crypto-config/ordererOrganizations/thesis.com/:/etc/hyperledger/channel/crypto-config/ordererOrganizations/thesis.com/
-    extra_hosts:
-      - "orderer.thesis.com:34.121.207.85"
-      - "orderer2.thesis.com:34.121.207.85"
-      - "orderer3.thesis.com:34.121.207.85"
-      - "peer0.thayson.thesis.com:34.121.207.85"
-      - "peer1.thayson.thesis.com:34.121.207.85"
-      - "peer0.cohuong.thesis.com:34.132.154.152"
-      - "peer1.cohuong.thesis.com:34.132.154.152"
+
   
   logger:
     container_name: fluentd

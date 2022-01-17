@@ -88,6 +88,34 @@ export CC_NAME="thesis"
 export ORDERER_CA=/etc/hyperledger/channel/crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/msp/tlscacerts/tlsca.thesis.com-cert.pem
 export VERSION="1"
 
+
+export CORE_PEER_LOCALMSPID="thaysonMSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/users/Admin@thayson.thesis.com/msp
+export CORE_PEER_ADDRESS=peer0.thayson.thesis.com:7051
+export CHANNEL_NAME="channelthayson"
+export CC_NAME="thesisonthayson"
+export ORDERER_CA=/etc/hyperledger/channel/crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/msp/tlscacerts/tlsca.thesis.com-cert.pem
+export VERSION="1"
+
+export CORE_PEER_LOCALMSPID="thaysonMSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/users/Admin@thayson.thesis.com/msp
+export CORE_PEER_ADDRESS=peer0.thayson.thesis.com:7051
+export CHANNEL_NAME="channelthayson"
+export CC_NAME="goonthayson"
+export ORDERER_CA=/etc/hyperledger/channel/crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/msp/tlscacerts/tlsca.thesis.com-cert.pem
+export VERSION="1"
+
+export CORE_PEER_LOCALMSPID="thaysonMSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/users/Admin@thayson.thesis.com/msp
+export CORE_PEER_ADDRESS=peer0.thayson.thesis.com:7051
+export CHANNEL_NAME="channelcohuong"
+export CC_NAME="thesiscohuong"
+export ORDERER_CA=/etc/hyperledger/channel/crypto-config/ordererOrganizations/thesis.com/orderers/orderer.thesis.com/msp/tlscacerts/tlsca.thesis.com-cert.pem
+export VERSION="1"
+
 peer lifecycle chaincode commit -o orderer.thesis.com:7050 --ordererTLSHostnameOverride orderer.thesis.com \
 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
 --channelID $CHANNEL_NAME --name ${CC_NAME} \
@@ -96,13 +124,100 @@ peer lifecycle chaincode commit -o orderer.thesis.com:7050 --ordererTLSHostnameO
 --signature-policy "OR('thaysonMSP.member', 'cohuongMSP.member')" \
 --version ${VERSION} --sequence ${VERSION} --init-required
 
+peer lifecycle chaincode commit -o orderer.thesis.com:7050 --ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+--channelID $CHANNEL_NAME --name ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+--version ${VERSION} --sequence ${VERSION} --init-required
+
 
 peer chaincode invoke -o orderer.thesis.com:7050 \
 --ordererTLSHostnameOverride orderer.thesis.com \
 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
 -C $CHANNEL_NAME -n ${CC_NAME} \
 --peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
--c '{"Args":["registerNongTrai","Thầy Sơn","Nông trại Thầy Sơn là nông trại cung cấp các loại rau củ, nấm rơm chất lượng","10 Huỳnh Văn Nghệ, Bửu Long, Thành phố Biên Hòa, Đồng Nai, Việt Nam","0123456789","vinhphuc@email.com","www.google.com","facebook.com/vinhphuc","https://google.com/imghp","https://www.google.com/maps/@10.9539723,106.7997188,18.92z"]}' --isInit
+-c '{"Args":["registerNongTrai","Thầy Sơn 2","Nông trại Thầy Sơn là nông trại cung cấp các loại rau củ, nấm rơm chất lượng","10 Huỳnh Văn Nghệ, Bửu Long, Thành phố Biên Hòa, Đồng Nai, Việt Nam","0123456789","vinhphuc@email.com","www.google.com","facebook.com/vinhphuc","https://google.com/imghp","https://www.google.com/maps/@10.9539723,106.7997188,18.92z"]}' --isInit
+
+
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["adddata","1","this is first data"]}' --isInit
+
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["adddata","1","this is second data"]}'
+
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["deldata","1"]}'
+
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "gethistory","Args":["1"]}' | jq .
+
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["UpdateData","1","this is first data"]}' --isInit
+
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["UpdateData","1","this is third data"]}' 
+
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["DeleteData","1"]}' 
+
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "GetHistoryData","Args":["1"]}' | jq .
+
+
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["DeleteData","1"]}' 
+
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["CreateData","1","this is first data"]}' 
+
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["updatedate","1","this is second data"]}'
+
+peer chaincode invoke -o orderer.thesis.com:7050 \
+--ordererTLSHostnameOverride orderer.thesis.com \
+--tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+-C $CHANNEL_NAME -n ${CC_NAME} \
+--peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
+-c '{"Args":["deldata","1"]}'
+
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "gethistory","Args":["1"]}' | jq .
+
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "gethistorytimecreateandtransaction","Args":["1"]}' | jq .
+
 
 
 peer chaincode invoke -o orderer.thesis.com:7050 \

@@ -22,7 +22,7 @@ createChannel(){
     setGlobalsForPeer0thayson
  
     # Replace localhost with your orderer's vm IP address
-    peer channel create -o ip_of_orderer:7050 -c $CHANNEL_NAME \
+    peer channel create -o localhost:7050 -c $CHANNEL_NAME \
     --ordererTLSHostnameOverride orderer.thesis.com \
     -f ./../../artifacts/channel/${CHANNEL_NAME}.tx --outputBlock ./channel-artifacts/${CHANNEL_NAME}.block \
     --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
@@ -37,7 +37,7 @@ joinChannel(){
 }
 updateAnchorPeers(){
     setGlobalsForPeer0thayson
-    peer channel update -o ip_of_orderer:7050 --ordererTLSHostnameOverride orderer.thesis.com -c $CHANNEL_NAME -f \
+    peer channel update -o localhost:7050 --ordererTLSHostnameOverride orderer.thesis.com -c $CHANNEL_NAME -f \
         ./../../artifacts/channel/${CORE_PEER_LOCALMSPID}anchors.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
 }
 
