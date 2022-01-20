@@ -47,6 +47,16 @@ class IOTContract extends Contract {
     let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
     return queryResults; //shim.success(queryResults);
   }
+  //xem tất cả nông trại cua mot to chuc
+  async xemTatCaNongTrai(ctx) {
+    const mspid = await ctx.clientIdentity.getMSPID();
+    let queryString = {};
+    queryString.selector = {};
+    queryString.selector.docType = 'NongTrai'
+    queryString.selector.mspid = mspid
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
   //them sản phẩm vào nông trại
   async themsanphamnongtrai(ctx, addressnongtrai, name, description) {
     const mspid = await ctx.clientIdentity.getMSPID();
