@@ -18,7 +18,7 @@ const bcrypt = require('bcrypt')
 //     return new MyTransactionEventHandler(transactionId, network, myOrgPeers);
 // }
 
-const invokeTransaction = async (channelName, chaincodeName, email, name, farmid) => {
+const invokeTransaction = async (channelName, chaincodeName, email, name, farmid, addressarea, addressproduct) => {
     try {
         logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
 
@@ -98,7 +98,7 @@ const invokeTransaction = async (channelName, chaincodeName, email, name, farmid
         console.log(email)
         result = await contract.submitTransaction(
             'createplantingseason',
-            name, farmid, email
+            name, farmid, email, addressarea, addressproduct
         )
 
         await gateway.disconnect();

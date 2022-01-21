@@ -65,6 +65,18 @@ const seealldeviceofnodeandareaaddress = require('./app/seealldeviceofnodeandare
 const adddatatodevice = require('./app/adddatatodevice')
 const seeinfohassendtodevice = require('./app/seeinfohassendtodevice')
 
+const seeinfofarmcuatochuc = require('./app/seeinfofarmcuatochuc')
+const getallplantingoffarmaddress = require('./app/seeallplantingseasonbaseonaddressfarm')
+const xemthongtinnongsan = require('./app/xemthongtinnongsan')
+const xemtatcanongsanofnode = require('./app/seeallnongsanofnode')
+const seeinfobonphancuasanpham = require('./app/seeinfobonphancuasanpham')
+const seeinfodotchamsoccuasanpham = require('./app/seeinfodotchamsoccuasanpham')
+const seeinfovumuacuasanpham = require('./app/seeinfovumuacuasanpham')
+
+const getsanphamoutput = require('./app/seeinfosanphamoutput')
+const addsanphamoutput = require('./app/addsanphamoutput')
+const seeallsanphamoutputbyharvestingaddress = require('./app/seeinfosanphamoutputbaseonharvesting')
+
 app.options('*', cors());
 app.use(cors());
 app.use(bodyParser.json());
@@ -283,6 +295,17 @@ app.get('/api/farm', async function (req, res) {
         error: "Thành công"
     })
 })
+// see info farm cua tochuc
+app.post('/api/farmcuatochuc', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/farmcuatochuc');
+    logger.debug('User name : ' + username);
+
+    let message = await seeinfofarmcuatochuc.query("mychannel", "thesis", 'admin');
+    res.status(200).json({
+        result: message
+    })
+})
 //see info farm all farm
 app.get('/api/allfarm', async function (req, res) {
     logger.debug('End point : /api/allfarm');
@@ -387,7 +410,7 @@ app.post('/api/createplantingseason', async function (req, res) {
     let farmid = req.query.farmid
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
-        let message = await addplantingseason.invokeTransaction("mychannel", "thesis", username, req.body.name, farmid);
+        let message = await addplantingseason.invokeTransaction("mychannel", "thesis", username, req.body.name, farmid, req.body.addressarea, req.body.addressproduct);
         res.status(200).json({
             result: message
         })
@@ -402,6 +425,34 @@ app.get('/api/getallplantingseasonofnode', async function (req, res) {
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
         let message = await getallplantingseasonbaseonnode.query("mychannel", "thesis", username);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+app.post('/api/getallplantingseasonoffarmaddress', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/getallplantingseasonoffarmaddress');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await getallplantingoffarmaddress.query("mychannel", "thesis", username, req.body.addressfarm);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+app.post('/api/getthongtinnongsan', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/getthongtinnongsan');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await xemthongtinnongsan.query("mychannel", "thesis", username, req.body.addressproduct);
         res.status(200).json({
             result: message
         })
@@ -430,6 +481,34 @@ app.get('/api/getallplantingofnode', async function (req, res) {
     let isUserRegistered = await helper.isUserRegistered(username, "thayson");
     if (isUserRegistered) {
         let message = await seeallplatingofnode.query("mychannel", "thesis", username);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+app.get('/api/getallnongsanofnode', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/getallnongsanofnode');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await xemtatcanongsanofnode.query("mychannel", "thesis", username);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+app.get('/api/getallthietbiofnode', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/getallnongsanofnode');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await xemtatcanongsanofnode.query("mychannel", "thesis", username);
         res.status(200).json({
             result: message
         })
@@ -601,6 +680,101 @@ app.post('/api/addevice', async function (req, res) {
     }
 })
 
+
+
+app.post('/api/addsanphamoutput', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/addsanphamoutput');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await addsanphamoutput.invokeTransaction("mychannel", "thesis", req.body.harvestingaddress, username);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+
+
+
+app.post('/api/seeinfosanphamoutput', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/seeinfosanphamoutput');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await getsanphamoutput.query("mychannel", "thesis", req.body.spoutputaddress, username);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+
+app.post('/api/seeallsanphamoutputbyharvestingaddress', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/seeinfosanphamoutput');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await seeallsanphamoutputbyharvestingaddress.query("mychannel", "thesis", req.body.spoutputaddress, username);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+
+app.post('/api/seebonphancuasanphamoutput', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/seeinfosanphamoutput');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await seeinfobonphancuasanpham.query("mychannel", "thesis", req.body.spoutputaddress, username);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+
+app.post('/api/seedotchamsocsanphamoutput', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/seedotchamsocsanphamoutput');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await seeinfodotchamsoccuasanpham.query("mychannel", "thesis", req.body.spoutputaddress, username);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+
+app.post('/api/seeinfovumuacuasanpham', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/seeinfovumuacuasanpham');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await seeinfovumuacuasanpham.query("mychannel", "thesis", req.body.spoutputaddress, username);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
+
+
 app.get('/api/getalldeviceofnode', async function (req, res) {
     const username = req.username
     logger.debug('End point : /api/getalldeviceofnode');
@@ -630,6 +804,7 @@ app.get('/api/getalldeviceofaddressfarm', async function (req, res) {
         res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
     }
 })
+
 app.get('/api/getalldeviceofaddressarea', async function (req, res) {
     const username = req.username
     logger.debug('End point : /api/getalldeviceofaddressarea');

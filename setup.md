@@ -19,7 +19,7 @@ rm -r -f ../cohuong/crypto-config/
 rm -r -f ../cohuong/create-certificate-with-ca/fabric-ca/
 rm -r -f ../orderer/crypto-config/
 rm -r -f ../orderer/create-certificate-with-ca/fabric-ca/
-rm -r -f /home/ubuntu/IOT_BlockChain/
+rm -r -f ../cohuong/channel-artifacts/*
 
 chmod 777 -R *
 git add *
@@ -160,7 +160,7 @@ peer chaincode invoke -o orderer.thesis.com:7050 \
 --peerAddresses peer0.thayson.thesis.com:7051 --tlsRootCertFiles /etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/peers/peer0.thayson.thesis.com/tls/ca.crt \
 -c '{"Args":["deldata","1"]}'
 
-peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "gethistory","Args":["1"]}' | jq .
+peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "getSanPhamOutputbymspandharvesting","Args":["624115009beb37818d762e336344275aa5134472c8bb6bbada42f3b4f46423d3"]}' | jq .
 
 peer chaincode invoke -o orderer.thesis.com:7050 \
 --ordererTLSHostnameOverride orderer.thesis.com \

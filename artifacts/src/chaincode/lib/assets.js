@@ -48,7 +48,7 @@ class IOTContract extends Contract {
     return queryResults; //shim.success(queryResults);
   }
   //xem tất cả nông trại cua mot to chuc
-  async xemTatCaNongTrai(ctx) {
+  async xemTatCaNongTraiCuaMotToChuc(ctx) {
     const mspid = await ctx.clientIdentity.getMSPID();
     let queryString = {};
     queryString.selector = {};
@@ -56,6 +56,21 @@ class IOTContract extends Contract {
     queryString.selector.mspid = mspid
     let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
     return queryResults; //shim.success(queryResults);
+  }
+  //querry nong trai theo mot to chuc
+  async querryNongTrai(ctx, addressnongtrai) {
+    const nongtraiAsBytes = await ctx.stub.getState(addressnongtrai);
+    if (!nongtraiAsBytes || nongtraiAsBytes.length === 0) {
+      throw new Error(`${nongtraiAsBytes} does not exist`);
+    }
+    const mspid = await ctx.clientIdentity.getMSPID();
+    const nongtraiInfo = JSON.parse(nongtraiAsBytes.toString());
+    if (nongtraiInfo.mspid === mspid) {
+      return nongtraiAsBytes.toString();
+    }
+    else {
+      throw new Error(`${nongtraiAsBytes} does not exist`);
+    }
   }
   //them sản phẩm vào nông trại
   async themsanphamnongtrai(ctx, addressnongtrai, name, description) {
@@ -80,6 +95,26 @@ class IOTContract extends Contract {
     let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
     return queryResults; //shim.success(queryResults);
   }
+  //xem tat ca san pham cua 1 node
+  async xemTatCaSanPhamCuaNode(ctx) {
+    let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.docType = 'Product'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //xem tat ca nong san cua 1 node
+  async xemTatCaSanPhamCua1NongTrai(ctx) {
+    let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.docType = 'Product'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
   //xem tat ca san pham co
   async xemTatCaSanPham(ctx) {
     let queryString = {};
@@ -87,6 +122,15 @@ class IOTContract extends Contract {
     queryString.selector.docType = 'Product'
     let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
     return queryResults; //shim.success(queryResults);
+  }
+  //xem thong tin 1 nong san
+  async querrynongsan(ctx, productaddress) {
+    const productAsBytes = await ctx.stub.getState(productaddress);
+    if (!productAsBytes || productAsBytes.length === 0) {
+      throw new Error(`${productAsBytes} does not exist`);
+    }
+    const productInfo = JSON.parse(productAsBytes.toString());
+    return productInfo;
   }
   //them 1 khu vuc vao 1 nong trai
   async addAreaToAFarm(ctx, name, description, addressfarm) {
@@ -193,18 +237,34 @@ class IOTContract extends Contract {
   }
 
   //create planting season
-  async createplantingseason(ctx, name, addressfarm, email) {
+  async createplantingseason(ctx, name, addressfarm, email, addressarea, addressproduct) {
     const nongtraiAsBytes = await ctx.stub.getState(addressfarm);
     if (!nongtraiAsBytes || nongtraiAsBytes.length === 0) {
       throw new Error(`${nongtraiAsBytes} does not exist`);
     }
     const mspid = await ctx.clientIdentity.getMSPID();
     const nongtraiInfo = JSON.parse(nongtraiAsBytes.toString());
+    const areaAsBytes = await ctx.stub.getState(addressarea);
+    if (!areaAsBytes || areaAsBytes.length === 0) {
+      throw new Error(`${areaAsBytes} does not exist`);
+    }
+    const areaInfo = JSON.parse(areaAsBytes.toString());
+    if (areaInfo.addressfarm !== addressfarm) {
+      throw new Error(`${areaAsBytes} does not exist`);
+    }
+    const productAsBytes = await ctx.stub.getState(addressproduct);
+    if (!productAsBytes || productAsBytes.length === 0) {
+      throw new Error(`${productAsBytes} does not exist`);
+    }
+    const productInfo = JSON.parse(productAsBytes.toString());
+    if (productInfo.addressnongtrai !== addressfarm) {
+      throw new Error(`${productAsBytes} does not exist`);
+    }
     if (nongtraiInfo.mspid === mspid) {
       const idpeople = await ctx.clientIdentity.getID();
       let _keyHelper = new Date();
       const plantingseason = {
-        docType: 'PlantingSeason', name, txId: this.TxId, mspid, idpeople, datecreated: _keyHelper, addressfarm, email
+        docType: 'PlantingSeason', name, txId: this.TxId, mspid, idpeople, datecreated: _keyHelper, addressfarm, email, addressproduct, addressarea
       }
       try {
         // store the composite key with a the value
@@ -218,11 +278,11 @@ class IOTContract extends Contract {
         //console.info(yearMonthIndexKey, _keyYearAsString, _keyMonthAsString, this.TxId);
 
         // store the new state
-        await ctx.stub.putState(yearMonthIndexKey, Buffer.from(JSON.stringify(plantingseason)));
+        await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(plantingseason)));
 
         // compose the return values
         return {
-          key: _keyYearAsString + '~' + _keyMonthAsString + '~' + _keyDateAsString + '~' + mspid + '~' + this.TxId
+          key: this.TxId
         };
 
       } catch (e) {
@@ -276,54 +336,46 @@ class IOTContract extends Contract {
     let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
     return queryResults; //shim.success(queryResults);
   }
+  //get all plating season by nongtrai
+  async getAllPlantingSeasonByAddressFarm(ctx, addressfarm) {
+    let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.addressfarm = addressfarm
+    queryString.selector.docType = 'PlantingSeason'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
   //tao planting
   async createPlanting(ctx, plantingseason, email, source, description) {
     const mspid = await ctx.clientIdentity.getMSPID();
     const idpeople = await ctx.clientIdentity.getID();
-    const args = ctx.stub.getArgs();
 
-    // we split the key into single peaces
-    const keyValues = plantingseason.split('~')
-    console.log(keyValues);
-    // collect the keys
-    let keys = []
-    keyValues.forEach(element => keys.push(element))
-    console.log(keys)
-
-    let resultsIterator = await ctx.stub.getStateByPartialCompositeKey('year~month~date~mspid~txid', keys);
-
-    while (true) {
-      const res = await resultsIterator.next();
-
-      if (res.value) {
-        const resultInfo = JSON.parse(res.value.value.toString('utf8'));
-        if (resultInfo.mspid === mspid) {
-          const userAsBytes = await ctx.stub.getState(email);
-          if (!userAsBytes || userAsBytes.length === 0) {
-            throw new Error(`${userAsBytes} does not exist`);
-          }
-          const userInfo = JSON.parse(userAsBytes.toString());
-          if (userInfo.mspid === mspid) {
-            let _keyHelper = new Date();
-            const doPlanting = {
-              email, source, description, datecreated: _keyHelper, docType: 'DoPlanting', plantingseason, mspid, idpeople
-            }
-            await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
-            console.info('============= END : Create Planting Thanh Cong ===========');
-            return this.txId;
-          }
-          else {
-            throw new Error(`${userAsBytes} does not exist in ${mspid}`);
-          }
-        }
-        else {
-          throw new Error(`${plantingseason} does not belong to ${mspid}`);
-        }
-      }
-      else {
-        throw new Error(`${plantingseason} khong ton tai`);
-      }
+    const userAsBytes = await ctx.stub.getState(email);
+    if (!userAsBytes || userAsBytes.length === 0) {
+      throw new Error(`${userAsBytes} does not exist`);
     }
+    const plantingseasonAsBytes = await ctx.stub.getState(plantingseason);
+    if (!plantingseasonAsBytes || plantingseasonAsBytes.length === 0) {
+      throw new Error(`${plantingseasonAsBytes} does not exist`);
+    }
+    const plantingseasonInfo = JSON.parse(plantingseasonAsBytes.toString());
+
+    const userInfo = JSON.parse(userAsBytes.toString());
+    if (userInfo.mspid === mspid && plantingseasonInfo.mspid === mspid) {
+      let _keyHelper = new Date();
+      const doPlanting = {
+        email, source, description, datecreated: _keyHelper, docType: 'DoPlanting', plantingseason, mspid, idpeople
+      }
+      await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
+      console.info('============= END : Create Planting Thanh Cong ===========');
+      return this.txId;
+    }
+    else {
+      throw new Error(`${userAsBytes} does not exist in ${mspid}`);
+    }
+
   }
   //get all planting by msp
   async getPlantingbymsp(ctx) {
@@ -349,49 +401,30 @@ class IOTContract extends Contract {
   async createFertilizing(ctx, plantingseason, email, fertilizerType, description) {
     const mspid = await ctx.clientIdentity.getMSPID();
     const idpeople = await ctx.clientIdentity.getID();
-
-    // we split the key into single peaces
-    const keyValues = plantingseason.split('~')
-    console.log(keyValues);
-    // collect the keys
-    let keys = []
-    keyValues.forEach(element => keys.push(element))
-    console.log(keys)
-
-    let resultsIterator = await ctx.stub.getStateByPartialCompositeKey('year~month~date~mspid~txid', keys);
-
-    while (true) {
-      const res = await resultsIterator.next();
-
-      if (res.value) {
-        const resultInfo = JSON.parse(res.value.value.toString('utf8'));
-        if (resultInfo.mspid === mspid) {
-          const userAsBytes = await ctx.stub.getState(email);
-          if (!userAsBytes || userAsBytes.length === 0) {
-            throw new Error(`${userAsBytes} does not exist`);
-          }
-          const userInfo = JSON.parse(userAsBytes.toString());
-          if (userInfo.mspid === mspid) {
-            let _keyHelper = new Date();
-            const doPlanting = {
-              email, fertilizerType, description, datecreated: _keyHelper, docType: 'DoFertilizing', plantingseason, mspid, idpeople
-            }
-            await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
-            console.info('============= END : Create Planting Thanh Cong ===========');
-            return this.txId;
-          }
-          else {
-            throw new Error(`${userAsBytes} does not exist in ${mspid}`);
-          }
-        }
-        else {
-          throw new Error(`${plantingseason} does not belong to ${mspid}`);
-        }
-      }
-      else {
-        throw new Error(`${plantingseason} khong ton tai`);
-      }
+    const userAsBytes = await ctx.stub.getState(email);
+    if (!userAsBytes || userAsBytes.length === 0) {
+      throw new Error(`${userAsBytes} does not exist`);
     }
+    const plantingseasonAsBytes = await ctx.stub.getState(plantingseason);
+    if (!plantingseasonAsBytes || plantingseasonAsBytes.length === 0) {
+      throw new Error(`${plantingseasonAsBytes} does not exist`);
+    }
+    const plantingseasonInfo = JSON.parse(plantingseasonAsBytes.toString());
+
+    const userInfo = JSON.parse(userAsBytes.toString());
+    if (userInfo.mspid === mspid && plantingseasonInfo.mspid === mspid) {
+      let _keyHelper = new Date();
+      const doPlanting = {
+        email, fertilizerType, description, datecreated: _keyHelper, docType: 'DoFertilizing', plantingseason, mspid, idpeople
+      }
+      await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
+      console.info('============= END : Create Planting Thanh Cong ===========');
+      return this.txId;
+    }
+    else {
+      throw new Error(`${userAsBytes} does not exist in ${mspid}`);
+    }
+
   }
   //get all fertilizing by msp
   async getFertilizingbymsp(ctx) {
@@ -418,48 +451,30 @@ class IOTContract extends Contract {
     const mspid = await ctx.clientIdentity.getMSPID();
     const idpeople = await ctx.clientIdentity.getID();
 
-    // we split the key into single peaces
-    const keyValues = plantingseason.split('~')
-    console.log(keyValues);
-    // collect the keys
-    let keys = []
-    keyValues.forEach(element => keys.push(element))
-    console.log(keys)
-
-    let resultsIterator = await ctx.stub.getStateByPartialCompositeKey('year~month~date~mspid~txid', keys);
-
-    while (true) {
-      const res = await resultsIterator.next();
-
-      if (res.value) {
-        const resultInfo = JSON.parse(res.value.value.toString('utf8'));
-        if (resultInfo.mspid === mspid) {
-          const userAsBytes = await ctx.stub.getState(email);
-          if (!userAsBytes || userAsBytes.length === 0) {
-            throw new Error(`${userAsBytes} does not exist`);
-          }
-          const userInfo = JSON.parse(userAsBytes.toString());
-          if (userInfo.mspid === mspid) {
-            let _keyHelper = new Date();
-            const doPlanting = {
-              email, method, description, datecreated: _keyHelper, docType: 'DoCaring', plantingseason, mspid, idpeople
-            }
-            await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
-            console.info('============= END : Create Planting Thanh Cong ===========');
-            return this.txId;
-          }
-          else {
-            throw new Error(`${userAsBytes} does not exist in ${mspid}`);
-          }
-        }
-        else {
-          throw new Error(`${plantingseason} does not belong to ${mspid}`);
-        }
-      }
-      else {
-        throw new Error(`${plantingseason} khong ton tai`);
-      }
+    const userAsBytes = await ctx.stub.getState(email);
+    if (!userAsBytes || userAsBytes.length === 0) {
+      throw new Error(`${userAsBytes} does not exist`);
     }
+    const plantingseasonAsBytes = await ctx.stub.getState(plantingseason);
+    if (!plantingseasonAsBytes || plantingseasonAsBytes.length === 0) {
+      throw new Error(`${plantingseasonAsBytes} does not exist`);
+    }
+    const plantingseasonInfo = JSON.parse(plantingseasonAsBytes.toString());
+
+    const userInfo = JSON.parse(userAsBytes.toString());
+    if (userInfo.mspid === mspid && plantingseasonInfo.mspid === mspid) {
+      let _keyHelper = new Date();
+      const doPlanting = {
+        email, method, description, datecreated: _keyHelper, docType: 'DoCaring', plantingseason, mspid, idpeople
+      }
+      await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
+      console.info('============= END : Create Planting Thanh Cong ===========');
+      return this.txId;
+    }
+    else {
+      throw new Error(`${userAsBytes} does not exist in ${mspid}`);
+    }
+
   }
   //get all fertilizing by msp
   async getCaringbymsp(ctx) {
@@ -485,48 +500,28 @@ class IOTContract extends Contract {
   async createHarvesting(ctx, plantingseason, email, quantity, description, result) {
     const mspid = await ctx.clientIdentity.getMSPID();
     const idpeople = await ctx.clientIdentity.getID();
+    const userAsBytes = await ctx.stub.getState(email);
+    if (!userAsBytes || userAsBytes.length === 0) {
+      throw new Error(`${userAsBytes} does not exist`);
+    }
+    const plantingseasonAsBytes = await ctx.stub.getState(plantingseason);
+    if (!plantingseasonAsBytes || plantingseasonAsBytes.length === 0) {
+      throw new Error(`${plantingseasonAsBytes} does not exist`);
+    }
+    const plantingseasonInfo = JSON.parse(plantingseasonAsBytes.toString());
 
-    // we split the key into single peaces
-    const keyValues = plantingseason.split('~')
-    console.log(keyValues);
-    // collect the keys
-    let keys = []
-    keyValues.forEach(element => keys.push(element))
-    console.log(keys)
-
-    let resultsIterator = await ctx.stub.getStateByPartialCompositeKey('year~month~date~mspid~txid', keys);
-
-    while (true) {
-      const res = await resultsIterator.next();
-
-      if (res.value) {
-        const resultInfo = JSON.parse(res.value.value.toString('utf8'));
-        if (resultInfo.mspid === mspid) {
-          const userAsBytes = await ctx.stub.getState(email);
-          if (!userAsBytes || userAsBytes.length === 0) {
-            throw new Error(`${userAsBytes} does not exist`);
-          }
-          const userInfo = JSON.parse(userAsBytes.toString());
-          if (userInfo.mspid === mspid) {
-            let _keyHelper = new Date();
-            const doPlanting = {
-              email, quantity, description, datecreated: _keyHelper, docType: 'DoHarvesting', plantingseason, mspid, idpeople, result
-            }
-            await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
-            console.info('============= END : Create Planting Thanh Cong ===========');
-            return this.txId;
-          }
-          else {
-            throw new Error(`${userAsBytes} does not exist in ${mspid}`);
-          }
-        }
-        else {
-          throw new Error(`${plantingseason} does not belong to ${mspid}`);
-        }
+    const userInfo = JSON.parse(userAsBytes.toString());
+    if (userInfo.mspid === mspid && plantingseasonInfo.mspid === mspid) {
+      let _keyHelper = new Date();
+      const doPlanting = {
+        email, quantity, description, datecreated: _keyHelper, docType: 'DoHarvesting', plantingseason, mspid, idpeople, result
       }
-      else {
-        throw new Error(`${plantingseason} khong ton tai`);
-      }
+      await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(doPlanting)));
+      console.info('============= END : Create Planting Thanh Cong ===========');
+      return this.txId;
+    }
+    else {
+      throw new Error(`${userAsBytes} does not exist in ${mspid}`);
     }
   }
   //get all harvesting by msp
@@ -547,6 +542,169 @@ class IOTContract extends Contract {
     queryString.selector.mspid = mspid
     queryString.selector.plantingseason = plantingseason
     queryString.selector.docType = 'DoHarvesting'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //add new sanpham
+  async createSanPhamOutput(ctx, harvestingaddress) {
+    const mspid = await ctx.clientIdentity.getMSPID();
+    const harvestingAsBytes = await ctx.stub.getState(harvestingaddress);
+    const idpeople = await ctx.clientIdentity.getID();
+    if (!harvestingAsBytes || harvestingAsBytes.length === 0) {
+      throw new Error(`${harvestingAsBytes} does not exist`);
+    }
+    const harvestingInfo = JSON.parse(harvestingAsBytes.toString());
+    if (harvestingInfo.mspid === mspid) {
+      const plantingseasonAsBytes = await ctx.stub.getState(harvestingInfo.plantingseason);
+      if (!plantingseasonAsBytes || plantingseasonAsBytes.length === 0) {
+        throw new Error(`${plantingseasonAsBytes} does not exist`);
+      }
+      const plantingseasonInfo = JSON.parse(plantingseasonAsBytes.toString());
+      let _keyHelper = new Date();
+      const addressproduct = plantingseasonInfo.addressproduct
+      const addressarea = plantingseasonInfo.addressarea
+      const addressplantingseason = harvestingInfo.plantingseason
+      const sanphamOutput = {
+        datecreated: _keyHelper, docType: 'SanPhamOutput', addressproduct, mspid, idpeople, addressarea, harvestingaddress, addressplantingseason, daban: false, nguoimua: "", ngaymua: ""
+      }
+      await ctx.stub.putState(this.TxId, Buffer.from(JSON.stringify(sanphamOutput)));
+      console.info('============= END : Create San Pham Output Thanh Cong ===========');
+      return this.txId;
+    }
+    throw new Error(`${harvestingAsBytes} does not exist in ${mspid}`);
+  }
+  //query san pham
+  async querrysanphamoutput(ctx, spoutputaddress) {
+    const productAsBytes = await ctx.stub.getState(spoutputaddress);
+    if (!productAsBytes || productAsBytes.length === 0) {
+      throw new Error(`${productAsBytes} does not exist`);
+    }
+    const productInfo = JSON.parse(productAsBytes.toString());
+    return productInfo;
+  }
+  //get all sanpham output baseon harvestingid
+  async getSanPhamOutputbymspandharvesting(ctx, harvesting) {
+    let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.harvestingaddress = harvesting
+    queryString.selector.docType = 'SanPhamOutput'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+
+  //get all sanpham output baseon vumuaid
+  async getSanPhamOutputbymspandseason(ctx, addressplantingseason) {
+    let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.addressplantingseason = addressplantingseason
+    queryString.selector.docType = 'SanPhamOutput'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //get all sanpham output baseon areaid
+  async getSanPhamOutputbymspandarea(ctx, addressarea) {
+    let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.addressarea = addressarea
+    queryString.selector.docType = 'SanPhamOutput'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //get all sanpham output baseon areaid,vumuaid,harvestingid
+  async getSanPhamOutputbymspandallcondition(ctx, addressarea, addressplantingseason, harvesting) {
+    let queryString = {};
+    const mspid = await ctx.clientIdentity.getMSPID();
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.addressarea = addressarea
+    queryString.selector.harvestingaddress = harvesting
+    queryString.selector.addressplantingseason = addressplantingseason
+    queryString.selector.docType = 'SanPhamOutput'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //get thong tin bonphan
+  async getThongTinBonPhanBaseOnSanPhamID(ctx, sanphamid) {
+    const sanphamAsBytes = await ctx.stub.getState(sanphamid);
+    if (!sanphamAsBytes || sanphamAsBytes.length === 0) {
+      throw new Error(`${sanphamAsBytes} does not exist`);
+    }
+    const sanphamInfo = JSON.parse(sanphamAsBytes.toString());
+    let queryString = {};
+    const mspid = sanphamInfo.mspid;
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.plantingseason = sanphamInfo.addressplantingseason
+    queryString.selector.docType = 'DoFertilizing'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //get thong tin dot thu hoach
+  async getThongTinDotThuHoachBaseOnSanPhamID(ctx, sanphamid) {
+    const sanphamAsBytes = await ctx.stub.getState(sanphamid);
+    if (!sanphamAsBytes || sanphamAsBytes.length === 0) {
+      throw new Error(`${sanphamAsBytes} does not exist`);
+    }
+    const sanphamInfo = JSON.parse(sanphamAsBytes.toString());
+    const harvestingaddress = sanphamInfo.harvestingaddress;
+    const harvestingAsBytes = await ctx.stub.getState(harvestingaddress);
+    if (!harvestingAsBytes || harvestingAsBytes.length === 0) {
+      throw new Error(`${harvestingAsBytes} does not exist`);
+    }
+    const harvestingInfo = JSON.parse(harvestingAsBytes.toString());
+    return harvestingInfo;
+  }
+  //get thong tin chamsoc cua sanpham
+  async getThongTinChamSocBaseOnSanPhamID(ctx, sanphamid) {
+    const sanphamAsBytes = await ctx.stub.getState(sanphamid);
+    if (!sanphamAsBytes || sanphamAsBytes.length === 0) {
+      throw new Error(`${sanphamAsBytes} does not exist`);
+    }
+    const sanphamInfo = JSON.parse(sanphamAsBytes.toString());
+    let queryString = {};
+    const mspid = sanphamInfo.mspid;
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.plantingseason = sanphamInfo.addressplantingseason
+    queryString.selector.docType = 'DoCaring'
+    let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
+    return queryResults; //shim.success(queryResults);
+  }
+  //get thong tin vu mua cua sanpham
+  async getThongTinVuMuaBaseOnSanPhamID(ctx, sanphamid) {
+    const sanphamAsBytes = await ctx.stub.getState(sanphamid);
+    if (!sanphamAsBytes || sanphamAsBytes.length === 0) {
+      throw new Error(`${sanphamAsBytes} does not exist`);
+    }
+    const sanphamInfo = JSON.parse(sanphamAsBytes.toString());
+    const addressplantingseason = sanphamInfo.addressplantingseason;
+    const addressplantingseasonAsBytes = await ctx.stub.getState(addressplantingseason);
+    if (!addressplantingseasonAsBytes || addressplantingseasonAsBytes.length === 0) {
+      throw new Error(`${addressplantingseasonAsBytes} does not exist`);
+    }
+    const addressplantingInfo = JSON.parse(addressplantingseasonAsBytes.toString());
+    return addressplantingInfo;
+  }
+
+  //get thong tin dot gieo trong cua sanpham
+  async getThongTinDotGieoTrongBaseOnSanPhamID(ctx, sanphamid) {
+    const sanphamAsBytes = await ctx.stub.getState(sanphamid);
+    if (!sanphamAsBytes || sanphamAsBytes.length === 0) {
+      throw new Error(`${sanphamAsBytes} does not exist`);
+    }
+    const sanphamInfo = JSON.parse(sanphamAsBytes.toString());
+    let queryString = {};
+    const mspid = sanphamInfo.mspid;
+    queryString.selector = {};
+    queryString.selector.mspid = mspid
+    queryString.selector.plantingseason = sanphamInfo.addressplantingseason
+    queryString.selector.docType = 'DoPlanting'
     let queryResults = await this.getQueryResultForQueryString(ctx.stub, JSON.stringify(queryString));
     return queryResults; //shim.success(queryResults);
   }

@@ -31,13 +31,13 @@
 #   For example, see "tls.certfile" and "tls.clientauth.certfiles".
 #   The value of each of these fields can be a simple filename, a
 #   relative path, or an absolute path.  If the value is not an
-#   absolute path, it is interpretted as being relative to the location
+#   absolute path, it is interpreted as being relative to the location
 #   of this configuration file.
 #
 #############################################################################
 
 # Version of config file
-version: 1.4.9
+version: 1.5.2
 
 # Server's listening port (default: 7054)
 port: 7054
@@ -78,8 +78,7 @@ tls:
 #  The CA section contains information related to the Certificate Authority
 #  including the name of the CA, which should be unique for all members
 #  of a blockchain network.  It also includes the key and certificate files
-#  used when issuing enrollment certificates (ECerts) and transaction
-#  certificates (TCerts).
+#  used when issuing enrollment certificates (ECerts).
 #  The chainfile (if it exists) contains the certificate chain which
 #  should be trusted for this CA, where the 1st in the chain is always the
 #  root CA certificate.
@@ -93,6 +92,8 @@ ca:
   certfile:
   # Chain file
   chainfile:
+  # Ignore Certificate Expiration in the case of re-enroll
+  reenrollIgnoreCertExpiry: false
 
 #############################################################################
 #  The gencrl REST endpoint is used to generate a CRL that contains revoked
@@ -109,9 +110,7 @@ crl:
 #  The registry section controls how the fabric-ca-server does two things:
 #  1) authenticates enrollment requests which contain a username and password
 #     (also known as an enrollment ID and secret).
-#  2) once authenticated, retrieves the identity's attribute names and
-#     values which the fabric-ca-server optionally puts into TCerts
-#     which it issues for transacting on the Hyperledger Fabric blockchain.
+#  2) once authenticated, retrieves the identity's attribute names and values.
 #     These attributes are useful for making access control decisions in
 #     chaincode.
 #  There are two main configuration options:
@@ -496,9 +495,9 @@ metrics:
         # statsd server address
         address: 127.0.0.1:8125
 
-        # the interval at which locally cached counters and gauges are pushsed
+        # the interval at which locally cached counters and gauges are pushed
         # to statsd; timings are pushed immediately
         writeInterval: 10s
 
-        # prefix is prepended to all emitted statsd merics
+        # prefix is prepended to all emitted statsd metrics
         prefix: server

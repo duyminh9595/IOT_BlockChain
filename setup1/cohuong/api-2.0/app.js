@@ -292,6 +292,20 @@ app.get('/api/allfarm', async function (req, res) {
         error: "Thành công"
     })
 })
+app.post('/api/farmcuatochuc', async function (req, res) {
+    const username = req.username
+    logger.debug('End point : /api/farmcuatochuc');
+    logger.debug('User name : ' + username);
+    let isUserRegistered = await helper.isUserRegistered(username, "thayson");
+    if (isUserRegistered) {
+        let message = await addProduct.invokeTransaction("mychannel", "thesis", username, farmid, req.body.name, req.body.description);
+        res.status(200).json({
+            result: message
+        })
+    } else {
+        res.status(500).json({ success: false, message: `User with username ${username} is not registered with thay son, Please register first.` });
+    }
+})
 app.post('/api/addnongsan', async function (req, res) {
     const username = req.username
     logger.debug('End point : /api/addnongsan');
