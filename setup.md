@@ -11,7 +11,7 @@ docker swarm join --token SWMTKN-1-3ogumfkl4ep24jh33zj0arbn4osj3emky3h61alp2m0sh
 docker network create --attachable --driver overlay artifacts_thesis
 
 # remove ca
-cd /home/ubuntu/IOT_BlockChain/setup1/thayson
+cd /home/duyminh95/IOT_BlockChain/setup1/thayson
 rm -r -f ../thayson/crypto-config/
 rm -r -f ../thayson/channel-artifacts/*
 rm -r -f ../thayson/create-certificate-with-ca/fabric-ca/
@@ -30,7 +30,7 @@ duyminh95@gmail.com
 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
 
 # tạo ca
-cd /home/ubuntu/IOT_BlockChain/setup1/thayson/create-certificate-with-ca/
+cd /home/duyminh95/IOT_BlockChain/setup1/thayson/create-certificate-with-ca/
 docker-compose up -d
 ./create-certificate-with-ca.sh 
 cd ../../cohuong/create-certificate-with-ca/
