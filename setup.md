@@ -65,13 +65,13 @@ http://35.224.10.90:4000/api/adduserincome
 
 # add extra hosts
 extra_hosts:
-      - "orderer.thesis.com:34.121.207.85"
-      - "orderer2.thesis.com:34.121.207.85"
-      - "orderer3.thesis.com:34.121.207.85"
-      - "peer0.thayson.thesis.com:34.121.207.85"
-      - "peer1.thayson.thesis.com:34.121.207.85"
-      - "peer0.cohuong.thesis.com:34.132.154.152"
-      - "peer1.cohuong.thesis.com:34.132.154.152"
+      - "orderer.thesis.com:35.197.12.100"
+      - "orderer2.thesis.com:35.197.12.100"
+      - "orderer3.thesis.com:35.197.12.100"
+      - "peer0.thayson.thesis.com:34.82.120.99"
+      - "peer1.thayson.thesis.com:34.82.120.99"
+      - "peer0.cohuong.thesis.com:35.197.120.235"
+      - "peer1.cohuong.thesis.com:35.197.120.235"
 
 
 # code in cli

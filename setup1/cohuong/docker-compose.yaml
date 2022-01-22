@@ -88,6 +88,14 @@ services:
       - ./:/etc/hyperledger/channel/
     networks:
       - thesis
+    extra_hosts:
+      - "orderer.thesis.com:35.197.12.100"
+      - "orderer2.thesis.com:35.197.12.100"
+      - "orderer3.thesis.com:35.197.12.100"
+      - "peer0.thayson.thesis.com:34.82.120.99"
+      - "peer1.thayson.thesis.com:34.82.120.99"
+      - "peer0.cohuong.thesis.com:35.197.120.235"
+      - "peer1.cohuong.thesis.com:35.197.120.235"
 
 
   peer1.cohuong.thesis.com:
@@ -131,6 +139,14 @@ services:
       - ./:/etc/hyperledger/channel/
     networks:
       - thesis
+    extra_hosts:
+      - "orderer.thesis.com:35.197.12.100"
+      - "orderer2.thesis.com:35.197.12.100"
+      - "orderer3.thesis.com:35.197.12.100"
+      - "peer0.thayson.thesis.com:34.82.120.99"
+      - "peer1.thayson.thesis.com:34.82.120.99"
+      - "peer0.cohuong.thesis.com:35.197.120.235"
+      - "peer1.cohuong.thesis.com:35.197.120.235"
   
   cli:
     container_name: cli
@@ -139,7 +155,7 @@ services:
     environment:
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_LOGGING_LEVEL=DEBUG
+      # - CORE_LOGGING_LEVEL=DEBUG
       - CORE_PEER_ID=cli
       - CORE_PEER_ADDRESS=peer0.cohuong.thesis.com:9051
       - CORE_PEER_LOCALMSPID=cohuongMSP
@@ -161,4 +177,12 @@ services:
       - ./../thayson/crypto-config/peerOrganizations/thayson.thesis.com/:/etc/hyperledger/channel/crypto-config/peerOrganizations/thayson.thesis.com/
       - ./crypto-config/peerOrganizations/cohuong.thesis.com/:/etc/hyperledger/channel/crypto-config/peerOrganizations/cohuong.thesis.com/
       - ./../orderer/crypto-config/ordererOrganizations/thesis.com/:/etc/hyperledger/channel/crypto-config/ordererOrganizations/thesis.com/
+    extra_hosts:
+      - "orderer.thesis.com:35.197.12.100"
+      - "orderer2.thesis.com:35.197.12.100"
+      - "orderer3.thesis.com:35.197.12.100"
+      - "peer0.thayson.thesis.com:34.82.120.99"
+      - "peer1.thayson.thesis.com:34.82.120.99"
+      - "peer0.cohuong.thesis.com:35.197.120.235"
+      - "peer1.cohuong.thesis.com:35.197.120.235"
 

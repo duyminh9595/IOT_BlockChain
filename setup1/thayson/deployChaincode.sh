@@ -88,7 +88,7 @@ approveForMythayson() {
     setGlobalsForPeer0thayson
     # set -x
     # Replace localhost with your orderer's vm IP address
-    peer lifecycle chaincode approveformyorg -o localhost:7050 \
+    peer lifecycle chaincode approveformyorg -o 35.197.12.100:7050 \
         --ordererTLSHostnameOverride orderer.thesis.com --tls \
         --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name ${CC_NAME} --version ${VERSION} \
         --init-required --package-id ${PACKAGE_ID} \

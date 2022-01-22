@@ -33,8 +33,8 @@ services:
       file: base.yaml
       service: peer-base
     environment:
-      - FABRIC_LOGGING_SPEC=DEBUG
-      - ORDERER_GENERAL_LOGLEVEL=DEBUG
+      # - FABRIC_LOGGING_SPEC=DEBUG
+      # - ORDERER_GENERAL_LOGLEVEL=DEBUG
       - CORE_PEER_LOCALMSPID=thaysonMSP
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=artifacts_thesis
       - CORE_PEER_ID=peer0.thayson.thesis.com
@@ -70,6 +70,14 @@ services:
       driver: fluentd
       options:
         tag: docker.{{.ID}}
+    extra_hosts:
+      - "orderer.thesis.com:35.197.12.100"
+      - "orderer2.thesis.com:35.197.12.100"
+      - "orderer3.thesis.com:35.197.12.100"
+      - "peer0.thayson.thesis.com:34.82.120.99"
+      - "peer1.thayson.thesis.com:34.82.120.99"
+      - "peer0.cohuong.thesis.com:35.197.120.235"
+      - "peer1.cohuong.thesis.com:35.197.120.235"
 
 
 
@@ -79,8 +87,8 @@ services:
       file: base.yaml
       service: peer-base
     environment:
-      - FABRIC_LOGGING_SPEC=DEBUG
-      - ORDERER_GENERAL_LOGLEVEL=debug
+      # - FABRIC_LOGGING_SPEC=DEBUG
+      # - ORDERER_GENERAL_LOGLEVEL=debug
       - CORE_PEER_LOCALMSPID=thaysonMSP
 
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=artifacts_thesis
@@ -121,6 +129,14 @@ services:
         tag: docker.{{.ID}}
     networks:
       - thesis
+    extra_hosts:
+      - "orderer.thesis.com:35.197.12.100"
+      - "orderer2.thesis.com:35.197.12.100"
+      - "orderer3.thesis.com:35.197.12.100"
+      - "peer0.thayson.thesis.com:34.82.120.99"
+      - "peer1.thayson.thesis.com:34.82.120.99"
+      - "peer0.cohuong.thesis.com:35.197.120.235"
+      - "peer1.cohuong.thesis.com:35.197.120.235"
 
 
   cli:
@@ -130,7 +146,7 @@ services:
     environment:
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_LOGGING_LEVEL=DEBUG
+      # - CORE_LOGGING_LEVEL=DEBUG
       - CORE_PEER_ID=cli
       - CORE_PEER_ADDRESS=peer0.thayson.thesis.com:7051
       - CORE_PEER_LOCALMSPID=thaysonMSP
